@@ -109,7 +109,7 @@ async function FetchAndDisplayOrderPosts(page = 1) {
         }
         const result = await response.json();
         const orderPosts = result.orders;
-        console.log('Fetched order posts:', orderPosts);
+        // console.log('Fetched order posts:', orderPosts);
         const totalPages = result.totalPages || 1;
 
         DisplayOrderPosts(orderPosts);
