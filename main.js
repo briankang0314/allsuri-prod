@@ -1,16 +1,16 @@
 // Import page setup functions
 import { SetupLandingPage } from './pages/landingPage.js';
-import { SetupNotificationsPage } from './pages/notificationsPage.js';
-import { SetupHomePage } from './pages/homePage.js';
-import { SetupLoginPage } from './pages/loginPage.js';
-import { SetupEditProfilePage } from './pages/editProfilePage.js';
-import { SetupPostOrderPage } from './pages/postOrderPage.js';
-import { SetupApplyForOrderPage } from './pages/applyForOrderPage.js';
-import { SetupMyOrdersPage } from './pages/myOrdersPage.js';
-import { SetupOrderApplicationsPage } from './pages/orderApplicationsPage.js';
-import { SetupMyApplicationsPage } from './pages/myApplicationsPage.js';
-import { SetupChatPage } from './pages/chatPage.js';
-import { FetchUserProfile, SetupMyProfileEventListeners } from './pages/userProfilePage.js';
+// import { SetupNotificationsPage } from './pages/notificationsPage.js';
+// import { SetupHomePage } from './pages/homePage.js';
+// import { SetupLoginPage } from './pages/loginPage.js';
+// import { SetupEditProfilePage } from './pages/editProfilePage.js';
+// import { SetupPostOrderPage } from './pages/postOrderPage.js';
+// import { SetupApplyForOrderPage } from './pages/applyForOrderPage.js';
+// import { SetupMyOrdersPage } from './pages/myOrdersPage.js';
+// import { SetupOrderApplicationsPage } from './pages/orderApplicationsPage.js';
+// import { SetupMyApplicationsPage } from './pages/myApplicationsPage.js';
+// import { SetupChatPage } from './pages/chatPage.js';
+// import { FetchUserProfile, SetupMyProfileEventListeners } from './pages/userProfilePage.js';
 
 // Import utility functions
 import { ShowErrorMessage } from './utils/helpers.js';
