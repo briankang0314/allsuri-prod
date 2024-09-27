@@ -2,6 +2,8 @@ import { FillTheBody } from './main.js';
 import { LoginByKakao } from './auth/auth.js';
 import { KAKAO_APP_KEY } from './utils/constants.js';
 
+
+
 document. addEventListener('DOMContentLoaded', async () => {
 	if (window.matchMedia('(display-mode: standalone)').matches) {
 		Kakao.init(KAKAO_APP_KEY);
