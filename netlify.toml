@@ -11,9 +11,9 @@ headers = []
 [functions."*"]
 
 [build]
-command = "npm run build"
-publish = "dist"
-publishOrigin = "default"
+  command = "npm run build"
+  publish = "dist"
+  publishOrigin = "default"
 
 [build.environment]
 
