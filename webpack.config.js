@@ -1,4 +1,6 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './app.js', // Your main JS file
@@ -6,6 +8,25 @@ module.exports = {
     filename: 'bundle.js', // Output file
     path: path.resolve(__dirname, 'dist'), // Output directory
   },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'assets', to: 'assets' },
+        { from: 'styles', to: 'styles' },
+        { from: 'favicon.ico', to: 'favicon.ico' },
+		{ from: 'manifest.json', to: 'manifest.json' },
+		{ from: 'contents', to: 'contents' },
+		{ from: 'api', to: 'api' },
+		{ from: 'auth', to: 'auth' },
+		{ from: 'pages', to: 'pages' },
+		{ from: 'utils', to: 'utils' },
+      ],
+    }),
+    new HtmlWebpackPlugin({
+      template: './index.html',
+	  filename: 'index.html'
+    }),
+  ],
   module: {
     rules: [
       {
