@@ -1,11 +1,7 @@
 import { FillTheBody } from '../main.js';
-import { KAKAO_APP_KEY } from '../utils/constants.js';
 import { GetDeviceToken } from '../api/firebaseService.js';
 
-if (!window.Kakao.isInitialized()) {
-    window.Kakao.init(KAKAO_APP_KEY);
-    console.log('Kakao SDK initialized:', window.Kakao.isInitialized());
-}
+
 
 export async function LoginByKakao() {
     const urlParams = new URLSearchParams(window.location.search);
