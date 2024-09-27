@@ -1,6 +1,6 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
-import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
+import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
 import { cities, regions } from '../utils/constants.js';
 
 
