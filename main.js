@@ -2,7 +2,7 @@
 import { SetupLandingPage } from './pages/landingPage.js';
 import { SetupNotificationsPage } from './pages/notificationsPage.js';
 import { SetupLoginPage } from './pages/loginPage.js';
-// import { SetupHomePage } from './pages/homePage.js';
+import { SetupHomePage } from './pages/homePage.js';
 // import { SetupEditProfilePage } from './pages/editProfilePage.js';
 // import { SetupPostOrderPage } from './pages/postOrderPage.js';
 // import { SetupApplyForOrderPage } from './pages/applyForOrderPage.js';
