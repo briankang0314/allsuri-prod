@@ -18,7 +18,7 @@ export async function SetupLoginPage() {
         kakaoLoginBtn.addEventListener('click', function () {
             console.log('Attempting Kakao login');
             Kakao.Auth.authorize({
-                redirectUri: 'https://allsuri-test.netlify.app/oauth/callback',
+                redirectUri: 'https://allsuri.netlify.app/oauth/callback',
             });
         });
     }
