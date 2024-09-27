@@ -2,6 +2,7 @@ import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
 import { cities, regions } from '../utils/constants.js';
+import { Logout } from '../auth/auth.js';
 
 
 
@@ -293,6 +294,9 @@ function HandleDropdownItemClick(e) {
                 break;
             case '#my-applications':
                 FillTheBody('my-applications');  // New case for My Applications
+                break;
+			case '#logout':
+                Logout();
                 break;
         }
     } catch (error) {

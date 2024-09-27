@@ -24,7 +24,9 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       template: './index.html',
-	  filename: 'index.html'
+	    filename: 'index.html',
+      inject: 'body',
+      scriptLoading: 'blocking'
     }),
   ],
   module: {
