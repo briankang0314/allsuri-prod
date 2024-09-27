@@ -1,7 +1,6 @@
 import { FillTheBody } from '../main.js';
-import { SaveDeviceToken } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
-
+import { SaveDeviceToken } from '../api/firebaseService.js';
 
 
 export async function SetupNotificationPage() {
