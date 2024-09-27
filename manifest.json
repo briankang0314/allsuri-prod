@@ -1,0 +1,16 @@
+{
+  "name": "올수리(테스트)",
+  "short_name": "올수리",
+  "version": "1.0.0",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/assets/icon_1280.png",
+      "sizes": "1280x1280",
+      "type": "image/png"
+    }
+  ]
+}
