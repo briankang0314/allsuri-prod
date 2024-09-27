@@ -5,6 +5,21 @@ import { cities, regions } from '../utils/constants.js';
 
 
 
+let currentFilters = {
+    region: '',
+    city: '',
+    status: ''
+};
+
+let currentSort = 'created_at';
+
+let currentPage = 1;
+const postsPerPage = 10;
+
+let currentOrderId = null;
+
+
+
 export async function SetupHomePage() {
     console.log('Setting up home page');
 
