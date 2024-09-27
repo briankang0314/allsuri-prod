@@ -6,7 +6,7 @@ import { KAKAO_APP_KEY } from './utils/constants.js';
 
 document. addEventListener('DOMContentLoaded', async () => {
 	if (window.matchMedia('(display-mode: standalone)').matches) {
-		window.Kakao.init(KAKAO_APP_KEY);
+		if (!window.Kakao.isInitialized()) { window.Kakao.init(KAKAO_APP_KEY); }
 
 		if (window.location.pathname === '/oauth/callback') { await LoginByKakao(); return; }
 
