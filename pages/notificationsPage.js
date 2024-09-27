@@ -3,7 +3,7 @@ import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
 import { SaveDeviceToken } from '../api/firebaseService.js';
 
 
-export async function SetupNotificationPage() {
+export async function SetupNotificationsPage() {
     // Show or hide sections based on notification permission
     document.getElementById('default').style.display = 'none';
     document.getElementById('denied').style.display = 'none';
