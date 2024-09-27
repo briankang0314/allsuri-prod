@@ -1,4 +1,4 @@
-import { FillTheBody } from '../app.js';
+import { FillTheBody } from '../main.js';
 import { KAKAO_APP_KEY } from '../utils/constants.js';
 import { GetDeviceToken } from '../api/firebaseService.js';
 
