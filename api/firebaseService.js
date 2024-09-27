@@ -1,3 +1,8 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js';
+import { getMessaging, getToken } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-messaging.js';
+
+
+
 export async function GetDeviceToken() {
     let deviceToken = localStorage.getItem('DeviceToken');
     if (!deviceToken) {
