@@ -1,5 +1,4 @@
-import { GetValidAccessToken, RefreshAccessToken } from '../auth/auth.js';
-import { ShowErrorMessage } from '../utils/helpers.js';
+import { GetValidAccessToken } from '../auth/auth.js';
 
 export async function MakeAuthenticatedRequest(url, options = {}) {
     console.log('MakeAuthenticatedRequest called with URL:', url);
