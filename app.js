@@ -10,9 +10,13 @@ document. addEventListener('DOMContentLoaded', async () => {
 
 		if (window.location.pathname === '/oauth/callback') { await LoginByKakao(); return; }
 
-		if (Notification.permission != 'granted') { FillTheBody('notification'); return; }
+        const deviceToken = localStorage.getItem('DeviceToken');
+		if (Notification.permission !== 'granted' || !deviceToken) {
+            await FillTheBody('notification');
+            return;
+        }
 
-		if (localStorage.getItem('user') == null || localStorage.getItem('tokens') == null) { await FillTheBody('login'); return; }
+		if (!localStorage.getItem('user') || !localStorage.getItem('tokens')) { await FillTheBody('login'); return; }
 
 		await FillTheBody('home');
 	} else {
