@@ -78,11 +78,14 @@ export async function Logout() {
         console.log('No Kakao access token found, proceeding with local logout');	
     } else {
         console.log('Kakao access token found, initiating Kakao logout...');
+        Kakao.Auth.setAccessToken(accessToken);
+
         try {
             await Kakao.Auth.logout();
             console.log('Kakao logout successful');
         } catch (error) {
             console.error('Kakao logout failed', error);
+            Kakao.Auth.setAccessToken(null);
         }
     }
 
