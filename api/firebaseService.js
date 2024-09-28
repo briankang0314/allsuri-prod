@@ -20,14 +20,39 @@ export async function SaveDeviceToken() {
     const firebaseVapidKey = "BCqZ54Dgg6pEqMHIIRrS1zm5x-frIlYikBsFb6mKiS_p1P7gkUI9HVmRKFU7-ANI6zxiR6zUWC8uRtzndJvufWk";
 
     try {
-        const deviceToken = await getToken((getMessaging(initializeApp(firebaseConfig))), { firebaseVapidKey });
+        const app = initializeApp(firebaseConfig);
 
-        if (deviceToken) {
-            localStorage.setItem('DeviceToken', deviceToken);
-            console.log('New device token obtained and saved');
-            return deviceToken;
+        if ('serviceWorker' in navigator) {
+            // Register the service worker
+            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            console.log('Service Worker registration successful with scope:', registration.scope);
+
+            // Initialize Firebase Messaging
+            const messaging = getMessaging(app);
+
+            // Request permission if not already granted
+            if (Notification.permission !== 'granted') {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    throw new Error('Notification permission not granted');
+                }
+            }
+
+            // Get the device token
+            const deviceToken = await getToken(messaging, {
+                vapidKey: firebaseVapidKey,
+                serviceWorkerRegistration: registration,
+            });
+
+            if (deviceToken) {
+                localStorage.setItem('DeviceToken', deviceToken);
+                console.log('New device token obtained and saved');
+                return deviceToken;
+            } else {
+                throw new Error('Failed to obtain new device token');
+            }
         } else {
-            throw new Error('Failed to obtain new device token');
+            throw new Error('Service workers are not supported in this browser');
         }
     } catch (error) {
         console.error('Error saving device token:', error);
