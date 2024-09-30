@@ -16,8 +16,16 @@ export async function GetDeviceToken() {
 }
 
 export async function SaveDeviceToken() {
-    const firebaseConfig = { apiKey: "AIzaSyC31o_5NeICP4lmMM-siuiL0FpnT2bxHxc", authDomain: "allsuri-test-e2c8f.firebaseapp.com", projectId: "allsuri-test-e2c8f", storageBucket: "allsuri-test-e2c8f.appspot.com", messagingSenderId: "1018254528358", appId: "1:1018254528358:web:e76064107baac031b982a7", measurementId: "G-GL43C8EQCL" };
-    const firebaseVapidKey = "BCqZ54Dgg6pEqMHIIRrS1zm5x-frIlYikBsFb6mKiS_p1P7gkUI9HVmRKFU7-ANI6zxiR6zUWC8uRtzndJvufWk";
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0TopF4AXzudCBoNWTbFwXAuaV76TPke8",
+        authDomain: "allsuri-prod.firebaseapp.com",
+        projectId: "allsuri-prod",
+        storageBucket: "allsuri-prod.appspot.com",
+        messagingSenderId: "64688660310",
+        appId: "1:64688660310:web:22c5a4cca7d6097a1740f7",
+        measurementId: "G-L1JSJVYKLY"
+    };
+    const firebaseVapidKey = "BCPVfu1anuHyvCD2M5o56ZsMoll8xzhoofJzjXo3bgvp9h1BhWpP1owCbveh1Z2bmaeKDHt45bSbH4WlZTZQjQE";
 
     try {
         const app = initializeApp(firebaseConfig);
