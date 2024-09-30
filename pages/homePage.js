@@ -91,7 +91,7 @@ function SetupHomePageEventListeners() {
 
 async function FetchAndDisplayOrderPosts(page = 1) {
     try {
-        const response = await MakeAuthenticatedRequest('https://69qcfumvgb.execute-api.ap-southeast-2.amazonaws.com/GetOrders', {
+        const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/GetOrders', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

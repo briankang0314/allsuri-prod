@@ -38,6 +38,6 @@ export const cities = {
     17: ['서귀포시', '제주시'],
 };
 
-export const API_BASE_URL = 'https://69qcfumvgb.execute-api.ap-southeast-2.amazonaws.com';
+export const API_BASE_URL = 'https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com';
 
 export const KAKAO_APP_KEY = '8cdce0e36a3774e9d3d2a738f2d5192f';

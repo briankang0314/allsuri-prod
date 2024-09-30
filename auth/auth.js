@@ -15,7 +15,7 @@ export async function LoginByKakao() {
                 console.warn('Unable to obtain device token. Proceeding with login without it.');
             }
 
-            const response = await fetch('https://69qcfumvgb.execute-api.ap-southeast-2.amazonaws.com/KakaoLogin', {
+            const response = await fetch('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/KakaoLogin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export async function Logout() {
 
     // Proceed with server-side logout
     try {
-        const response = await fetch('https://69qcfumvgb.execute-api.ap-southeast-2.amazonaws.com/KakaoLogout', {
+        const response = await fetch('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/KakaoLogout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ export async function RefreshAccessToken() {
     }
 
     try {
-        const response = await fetch('https://69qcfumvgb.execute-api.ap-southeast-2.amazonaws.com/KakaoTokenRefresh', {
+        const response = await fetch('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/KakaoTokenRefresh', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
