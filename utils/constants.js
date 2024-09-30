@@ -40,4 +40,4 @@ export const cities = {
 
 export const API_BASE_URL = 'https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com';
 
-export const KAKAO_APP_KEY = '8cdce0e36a3774e9d3d2a738f2d5192f';
+export const KAKAO_APP_KEY = 'd3e6def7639d07ad73bea46535bffed4';
