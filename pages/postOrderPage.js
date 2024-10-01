@@ -13,8 +13,8 @@ let isSubmitting = false;
 export async function SetupPostOrderPage() {
     // Set up event listeners
     document.getElementById('post-order-form').addEventListener('submit', SubmitOrder);
-    document.getElementById('cancel-post-order').addEventListener('click', () => FillTheBody('home'));
-    document.getElementById('baack-btn').addEventListener('click', () => FillTheBody('home'));
+    document.getElementById('cancel-post-order').addEventListener('click', async () => await FillTheBody('home'));
+    document.getElementById('baack-btn').addEventListener('click', async () => await FillTheBody('home'));
 
     // Populate regions and set up region change listener
     PopulateRegions();
@@ -22,9 +22,9 @@ export async function SetupPostOrderPage() {
 
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 

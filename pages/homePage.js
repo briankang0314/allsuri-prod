@@ -38,16 +38,16 @@ function SetupHomePageEventListeners() {
     // Logo
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
     // Chat button
     const chatBtn = document.getElementById('chat-btn');    
     if (chatBtn) {
-        chatBtn.addEventListener('click', () => FillTheBody('chat'));
+        chatBtn.addEventListener('click', async () => await FillTheBody('chat'));
     }
 
     // Post Order button
@@ -339,7 +339,7 @@ function CreatePaginationItem(text, isEnabled, pageNumber, isActive = false) {
     return li;
 }
 
-function PopulateRegionFilter(selectElement) {
+export function PopulateRegionFilter(selectElement) {
     regions.forEach(region => {
         const option = document.createElement('option');
         option.value = region.name;
@@ -348,7 +348,7 @@ function PopulateRegionFilter(selectElement) {
     });
 }
 
-function PopulateCityFilter(selectElement, selectedRegion) {
+export function PopulateCityFilter(selectElement, selectedRegion) {
     selectElement.innerHTML = '<option value="">도시 선택</option>';
     const regionId = regions.find(r => r.name === selectedRegion)?.id;
     if (regionId && cities[regionId]) {

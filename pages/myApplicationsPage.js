@@ -18,15 +18,15 @@ export async function SetupMyApplicationsPage() {
 
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
     const backBtn = document.getElementById('back-btn');
     if (backBtn) {
-        backBtn.addEventListener('click', () => FillTheBody('home'));
+        backBtn.addEventListener('click', async () => await FillTheBody('home'));
     }
 
     const refreshBtn = document.getElementById('refresh-btn');

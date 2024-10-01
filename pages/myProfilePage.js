@@ -46,20 +46,20 @@ export async function FetchUserProfile() {
 function SetupMyProfileEventListeners() {
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
     const backBtn = document.getElementById('back-btn');
     if (backBtn) {
-        backBtn.addEventListener('click', () => FillTheBody('home'));
+        backBtn.addEventListener('click', async () => await FillTheBody('home'));
     }
 
     const editProfileBtn = document.getElementById('edit-profile-btn');
     if (editProfileBtn) {
-        editProfileBtn.addEventListener('click', () => FillTheBody('edit-profile'));
+        editProfileBtn.addEventListener('click', async () => await FillTheBody('edit-profile'));
     }
 
     InitializeAnimations();
@@ -150,7 +150,7 @@ export function ShowIncompleteProfileWarning() {
 
     const completeProfileBtn = document.getElementById('complete-profile-btn');
     if (completeProfileBtn) {
-        completeProfileBtn.addEventListener('click', () => FillTheBody('edit-profile'));
+        completeProfileBtn.addEventListener('click', async () => await FillTheBody('edit-profile'));
     }
 }
 

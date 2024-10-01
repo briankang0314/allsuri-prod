@@ -6,9 +6,9 @@ export async function SetupLoginPage() {
     // Handle logo link click
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
@@ -26,6 +26,6 @@ export async function SetupLoginPage() {
     // Handle back button click
     const backButton = document.getElementById('back-btn');
     if (backButton) {
-        backButton.addEventListener('click', () => FillTheBody('home'));
+        backButton.addEventListener('click', async () => await FillTheBody('home'));
     }
 }

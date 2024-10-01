@@ -17,9 +17,16 @@ import { ShowErrorMessage } from './utils/helpers.js';
 export async function FillTheBody(contentName, params = {}) {
     try {
         // Fetch and render the page content
-        const content = await fetch(`/contents/${contentName}.html`).then(response => response.text());
+        const response = await fetch(`/contents/${contentName}.html`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${contentName}: ${response.statusText}`);
+        }
+        const content = await response.text();
+
         const sanitizedContent = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
         document.body.innerHTML = sanitizedContent;
+
+        await new Promise(resolve => setTimeout(resolve));
 
         // Delegate page-specific setup
         switch (contentName) {

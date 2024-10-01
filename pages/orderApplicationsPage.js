@@ -19,16 +19,16 @@ export async function SetupOrderApplicationsPage(params) {
 
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
     const backBtn = document.getElementById('back-btn');
     if (backBtn) {
         console.log('Back button found, setting up event listener');
-        backBtn.addEventListener('click', () => FillTheBody('my-orders'));
+        backBtn.addEventListener('click', async () => await FillTheBody('my-orders'));
     } else {
         console.warn('Back button not found');
     }

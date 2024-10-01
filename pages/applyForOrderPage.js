@@ -1,6 +1,7 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
+import { equipmentGroups } from '../utils/constants.js';
 import { ShowIncompleteProfileWarning } from './myProfilePage.js';
 import { CheckProfileCompleteness } from './editProfilePage.js';
 
@@ -46,9 +47,9 @@ export async function SetupApplyForOrderPage() {
     const backBtn = document.getElementById('back-btn');
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
@@ -635,7 +636,7 @@ async function SubmitApplication() {
     }
 
     try {
-        const response = await MakeAuthenticatedRequest('https://69qcfumvgb.execute-api.ap-southeast-2.amazonaws.com/SubmitApplication', {
+        const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/SubmitApplication', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

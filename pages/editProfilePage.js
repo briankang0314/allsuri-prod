@@ -13,16 +13,16 @@ export async function SetupEditProfilePage() {
 
         const logoLink = document.getElementById('logo-link');
         if (logoLink) {
-            logoLink.addEventListener('click', (e) => {
+            logoLink.addEventListener('click', async (e) => {
                 e.preventDefault();
-                FillTheBody('home');
+                await FillTheBody('home');
             });
         }
 
         const backBtn = document.getElementById('back-btn');
         console.log("Back button found:", !!backBtn);
         if (backBtn) {
-            backBtn.addEventListener('click', () => FillTheBody('my-profile'));
+            backBtn.addEventListener('click', async () => await FillTheBody('my-profile'));
         }
 
         const saveProfileChangesBtn = document.getElementById('btn-save-profile');

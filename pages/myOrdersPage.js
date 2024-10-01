@@ -1,7 +1,7 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
-import { currentOrderId, postsPerPage, UpdatePagination } from './homePage.js';
+import { currentOrderId, postsPerPage, UpdatePagination, PopulateRegionFilter, PopulateCityFilter } from './homePage.js';
 
 
 
@@ -52,20 +52,20 @@ export async function FetchAndDisplayMyOrderPosts(page = 1) {
 export async function SetupMyOrdersPage() {
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
-        logoLink.addEventListener('click', (e) => {
+        logoLink.addEventListener('click', async (e) => {
             e.preventDefault();
-            FillTheBody('home');
+            await FillTheBody('home');
         });
     }
 
     const backBtn = document.getElementById('back-btn');
     if (backBtn) {
-        backBtn.addEventListener('click', () => FillTheBody('home'));
+        backBtn.addEventListener('click', async () => await FillTheBody('home'));
     }
 
     const newOrderBtn = document.getElementById('new-order-btn');
     if (newOrderBtn) {
-        newOrderBtn.addEventListener('click', () => FillTheBody('post-order'));
+        newOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
     }
 
     const refreshBtn = document.getElementById('refresh-btn');
@@ -244,7 +244,7 @@ function ShowMyOrderDetails(order) {
     const viewApplicationsBtn = document.getElementById('btn-view-applications');
     if (viewApplicationsBtn) {
         console.log('Setting up viewApplicationsBtn click handler');
-        viewApplicationsBtn.onclick = () => {
+        viewApplicationsBtn.onclick = async () => {
             console.log('viewApplicationsBtn clicked');
             // Close the current modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
@@ -256,7 +256,7 @@ function ShowMyOrderDetails(order) {
             }
             // Navigate to the new applications page
             console.log('Attempting to navigate to order-applications page');
-            FillTheBody('order-applications', { order: order });
+            await FillTheBody('order-applications', { order: order });
         };
     } else {
         console.error('viewApplicationsBtn not found');

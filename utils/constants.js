@@ -40,6 +40,17 @@ export const cities = {
 
 export const categories = ['누수', '방수', '하수구', '리모델링', '동파/해빙', '수도설비', '기타'];
 
+export const equipmentGroups = [
+    {
+        name: '누수 장비',
+        options: ['청음식탐지기', '가스식탐지기', '디지털압력계', '열화상카메라', '상관식탐지기', '수분측정기']
+    },
+    {
+        name: '하수구 장비',
+        options: ['관통기', '배관석션기', '플렉스샤프트', '배관내시경', '관로탐지기', '고압세척기']
+    }
+];
+
 export const API_BASE_URL = 'https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com';
 
 export const KAKAO_APP_KEY = 'd3e6def7639d07ad73bea46535bffed4';
