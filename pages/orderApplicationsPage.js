@@ -251,7 +251,7 @@ async function AcceptApplication(applicationId) {
 
     try {
         console.log('Sending AcceptApplication request to backend');
-        const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/AcceptApplication', {
+        const acceptResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/AcceptApplication', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,23 +262,49 @@ async function AcceptApplication(applicationId) {
             })
         });
 
-        console.log('Received response from AcceptApplication endpoint:', response);
+        console.log('Received response from AcceptApplication endpoint:', acceptResponse);
 
-        if (!response.ok) {
-            throw new Error(`Failed to accept application. Status: ${response.status}`);
+        if (!acceptResponse.ok) {
+            throw new Error(`Failed to accept application. Status: ${acceptResponse.status}`);
         }
 
-        const result = await response.json();
-        console.log('Parsed response body:', result);
+        const acceptResult = await acceptResponse.json();
+        console.log('Parsed response body:', acceptResult);
 
-        if (!result.success) {
+        if (!acceptResult.success) {
             throw new Error(result.error || 'Failed to accept application');
         }
 
         console.log('Application accepted successfully');
+
+        console.log('Sending notification to applicant');
+        const notifyResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/NotifyApplicantOfAcceptance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                application_id: applicationId
+            })
+        });
+
+        console.log('Received response from NotifyApplicantOfAcceptance endpoint:', notifyResponse);
+
+        if (!notifyResponse.ok) {
+            throw new Error(`Failed to send notification. Status: ${notifyResponse.status}`);
+        }
+
+        const notifyResult = await notifyResponse.json();
+        console.log('Parsed notification response:', notifyResult);
+
+        if (!notifyResult.success) {
+            throw new Error(notifyResult.error || 'Failed to send notification');
+        }
+
+        console.log('Notification sent successfully to the applicant');
         
-        if (result.sendbird_channel_url) {
-            console.log('Sendbird channel URL received:', result.sendbird_channel_url);
+        if (acceptResult.sendbird_channel_url) {
+            console.log('Sendbird channel URL received:', acceptResult.sendbird_channel_url);
             // You might want to store this URL or use it to redirect to the chat
 
         }
@@ -323,6 +349,34 @@ async function RejectApplication(applicationId) {
         const result = await response.json();
         if (!result.success) {
             throw new Error(result.error || 'Failed to reject application');
+        }
+
+        try {
+            const notifyResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/NotifyApplicantOfRejection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    application_id: applicationId
+                })
+            });
+
+            if (!notifyResponse.ok) {
+                throw new Error(`알림 전송에 실패했습니다. 상태 코드: ${notifyResponse.status}`);
+            }
+
+            const notifyResult = await notifyResponse.json();
+            if (!notifyResult.success) {
+                throw new Error(notifyResult.error || '알림 전송에 실패했습니다.');
+            }
+
+            console.log('지원자에게 알림이 성공적으로 전송되었습니다.');
+
+        } catch (error) {
+            console.error('지원자에게 알림 전송 중 오류 발생:', error);
+            // 알림 전송 실패 시 사용자에게 알릴지 결정하세요.
+            // ShowErrorMessage('지원자에게 알림을 보내는 중 오류가 발생했습니다.');
         }
 
         ShowSuccessMessage('지원서가 성공적으로 거절되었습니다.', 3000);

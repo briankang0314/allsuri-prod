@@ -649,6 +649,25 @@ async function SubmitApplication() {
         if (response.ok) {
             ShowSuccessMessage('지원이 성공적으로 제출되었습니다.', 3000);
             cleanupApplicationFormData();
+
+            try {
+                const notifyResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/NotifySubmissionToOrderOwner', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ order_id: applicationFormData.order_id })
+                });
+
+                if (notifyResponse.ok) {
+                    console.log('Notification successfully sent to order owner.');
+                } else {
+                    console.error('Failed to send notification to order owner.');
+                }
+            } catch (error) {
+                console.error('Error sending notification to order owner:', error);
+            }
+
             await FillTheBody('home');
         } else if (response.status === 400 && result.message === 'You have already applied to this order.') {
             ShowErrorMessage('이미 이 오더에 지원하셨습니다.', 3000);
