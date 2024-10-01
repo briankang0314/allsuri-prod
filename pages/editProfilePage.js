@@ -63,7 +63,12 @@ function PopulateEditProfileForm(profile) {
 
     PopulateRegions();
     const regionSelect = document.getElementById('region');
-    regionSelect.value = regions.find(r => r.name === profile.region)?.id ?? '';
+    const selectedRegion = regions.find(r => r.name === profile.region);
+    console.log('Profile region:', profile.region);
+    console.log('Selected region:', selectedRegion);
+
+    regionSelect.value = selectedRegion?.id ?? '';
+    console.log('Region select value:', regionSelect.value);
     regionSelect.addEventListener('change', (e) => { PopulateCities(e.target.value); });
 
     PopulateCities(regionSelect.value);

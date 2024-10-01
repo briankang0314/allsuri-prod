@@ -92,7 +92,7 @@ export function PopulateCities(regionId) {
         citySelect.appendChild(option);
         citySelect.disabled = true;  // Disable selection as there's only one option
     } else {
-        const citiesOfRegion = cities[regionId];
+        const citiesOfRegion = cities[parseInt(regionId)];
         console.log('Cities of region:', citiesOfRegion);
 
         if (Array.isArray(citiesOfRegion)) {
