@@ -18,7 +18,9 @@ export async function ShowLoadingSpinner() {
   
 	console.log('Appending spinner to body');
 	// Append the spinner to the body
-	document.body.appendChild(tempDiv.firstElementChild);
+	while (tempDiv.firstChild) {
+		document.body.appendChild(tempDiv.firstChild);
+	}
 
 	console.log('Loading spinner added successfully');
 }
