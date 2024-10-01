@@ -11,7 +11,7 @@ let myApplicationsCurrentFilters = {
 
 let myApplicationsCurrentSort = 'created_at';
 
-
+let currentPage = 1;
 
 export async function SetupMyApplicationsPage() {
     console.log('Setting up my applications page');
