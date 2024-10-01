@@ -50,6 +50,23 @@ export async function FetchAndDisplayMyOrderPosts(page = 1) {
 }
 
 export async function SetupMyOrdersPage() {
+	myOrdersCurrentFilters = {
+		region: '',
+		city: '',
+		status: ''
+	};
+	myOrdersCurrentSort = 'created_at';
+
+	const regionFilter = document.getElementById('region-filter');
+	const cityFilter = document.getElementById('city-filter');
+	const statusFilter = document.getElementById('status-filter');
+	const sortOption = document.getElementById('sort-option');
+
+	if (regionFilter) regionFilter.value = '';
+	if (cityFilter) cityFilter.value = '';
+	if (statusFilter) statusFilter.value = '';
+	if (sortOption) sortOption.value = 'created_at';
+	
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
         logoLink.addEventListener('click', async (e) => {
