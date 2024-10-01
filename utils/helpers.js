@@ -1,3 +1,5 @@
+import { regions, cities } from './constants.js';
+
 export function ShowErrorMessage(message, duration = 5000) {
     showMessage(message, duration, '#ff6b6b');
 }
