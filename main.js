@@ -18,8 +18,9 @@ export async function FillTheBody(contentName, params = {}) {
     try {
         // Fetch and render the page content
         const content = await fetch(`/contents/${contentName}.html`).then(response => response.text());
-        document.body.innerHTML = content;
-
+        // document.body.innerHTML = content;
+        document.getElementById('content').innerHTML = content;
+        
         // Delegate page-specific setup
         switch (contentName) {
             case 'landing':

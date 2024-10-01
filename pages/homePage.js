@@ -93,8 +93,6 @@ function SetupHomePageEventListeners() {
 
 async function FetchAndDisplayOrderPosts(page = 1) {
     try {
-		await ShowLoadingSpinner();
-
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/GetOrders', {
             method: 'POST',
             headers: {
@@ -122,9 +120,7 @@ async function FetchAndDisplayOrderPosts(page = 1) {
     } catch (error) {
         console.error('Error fetching order posts:', error);
         ShowErrorMessage('오더를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-		await HideLoadingSpinner();
-	}
+    }
 }
 
 function DisplayOrderPosts(orderPosts) {
