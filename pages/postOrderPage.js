@@ -3,6 +3,7 @@ import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, PopulateRegions, PopulateCities } from '../utils/helpers.js';
 import { ShowIncompleteProfileWarning } from './myProfilePage.js';
 import { CheckProfileCompleteness } from './editProfilePage.js';
+import { regions } from '../utils/constants.js';
 
 
 let isSubmitting = false;

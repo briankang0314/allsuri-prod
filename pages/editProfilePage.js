@@ -1,7 +1,6 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
-import { CheckProfileCompleteness } from './myProfilePage.js';
 import { regions } from '../utils/constants.js';
 
 
