@@ -1,5 +1,6 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
+import { InitializeApplicationForm } from './applyForOrderPage.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
 import { cities, regions } from '../utils/constants.js';
 import { Logout } from '../auth/auth.js';
@@ -15,9 +16,9 @@ let currentFilters = {
 let currentSort = 'created_at';
 
 let currentPage = 1;
-const postsPerPage = 10;
+export const postsPerPage = 10;
 
-let currentOrderId = null;
+export let currentOrderId = null;
 
 
 
@@ -305,7 +306,7 @@ function HandleDropdownItemClick(e) {
     }
 }
 
-function UpdatePagination(currentPage, totalPages) {
+export function UpdatePagination(currentPage, totalPages) {
     const paginationContainer = document.getElementById('pagination-container');
     if (!paginationContainer) return;
 

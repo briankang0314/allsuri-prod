@@ -1,6 +1,8 @@
 import { FillTheBody } from './main.js';
 import { LoginByKakao } from './auth/auth.js';
 import { KAKAO_APP_KEY } from './utils/constants.js';
+import { ShowIncompleteProfileWarning } from './pages/myProfilePage.js';
+import { CheckProfileCompleteness } from './pages/editProfilePage.js';
 
 
 
@@ -17,6 +19,7 @@ document. addEventListener('DOMContentLoaded', async () => {
         }
 
 		if (!localStorage.getItem('user') || !localStorage.getItem('tokens')) { await FillTheBody('login'); return; }
+        else { if (!await CheckProfileCompleteness()) {await FillTheBody('my-profile'); ShowIncompleteProfileWarning(); return;} }
 
 		await FillTheBody('home');
 	} else {

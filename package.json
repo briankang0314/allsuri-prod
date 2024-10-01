@@ -21,6 +21,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@sendbird/chat": "^4.14.4",
     "firebase": "^10.13.2"
   }
 }

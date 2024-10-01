@@ -38,6 +38,8 @@ export const cities = {
     17: ['서귀포시', '제주시'],
 };
 
+export const categories = ['누수', '방수', '하수구', '리모델링', '동파/해빙', '수도설비', '기타'];
+
 export const API_BASE_URL = 'https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com';
 
 export const KAKAO_APP_KEY = 'd3e6def7639d07ad73bea46535bffed4';
