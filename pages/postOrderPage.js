@@ -1,8 +1,8 @@
-import { FillTheBody } from './main.js';
-import { MakeAuthenticatedRequest } from '../utils/api.js';
+import { FillTheBody } from '../main.js';
+import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, PopulateRegions, PopulateCities } from '../utils/helpers.js';
-import { CheckProfileCompleteness, ShowIncompleteProfileWarning } from './myProfilePage.js';
-
+import { ShowIncompleteProfileWarning } from './myProfilePage.js';
+import { CheckProfileCompleteness } from './editProfilePage.js';
 
 
 let isSubmitting = false;

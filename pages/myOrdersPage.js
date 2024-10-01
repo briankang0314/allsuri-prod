@@ -49,7 +49,7 @@ export async function FetchAndDisplayMyOrderPosts(page = 1) {
     }
 }
 
-async function SetupMyOrdersPage() {
+export async function SetupMyOrdersPage() {
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
         logoLink.addEventListener('click', (e) => {
