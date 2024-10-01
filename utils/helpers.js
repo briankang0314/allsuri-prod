@@ -84,6 +84,13 @@ export function PopulateCities(regionId) {
     console.log('PopulateCities called with regionId:', regionId);
     const citySelect = document.getElementById('city');
     citySelect.innerHTML = '<option value="">도시 선택</option>';
+
+    if (!regionId) {
+        // No region selected, disable the city selection
+        citySelect.disabled = true;
+        console.log('No region selected. City selection is disabled.');
+        return;
+    }
     
     if (regionId == 9) {  // Sejong
         const option = document.createElement('option');
@@ -92,7 +99,8 @@ export function PopulateCities(regionId) {
         citySelect.appendChild(option);
         citySelect.disabled = true;  // Disable selection as there's only one option
     } else {
-        const citiesOfRegion = cities[parseInt(regionId)];
+        const parsedRegionId = parseInt(regionId);
+        const citiesOfRegion = cities[parsedRegionId];
         console.log('Cities of region:', citiesOfRegion);
 
         if (Array.isArray(citiesOfRegion)) {

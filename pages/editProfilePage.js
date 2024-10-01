@@ -71,8 +71,14 @@ function PopulateEditProfileForm(profile) {
     console.log('Region select value:', regionSelect.value);
     regionSelect.addEventListener('change', (e) => { PopulateCities(e.target.value); });
 
-    PopulateCities(regionSelect.value);
-    document.getElementById('city').value = profile.city ?? '';
+    if (regionSelect.value) {
+        PopulateCities(regionSelect.value);
+        document.getElementById('city').value = profile.city ?? '';
+    } else {
+        const citySelect = document.getElementById('city');
+        citySelect.innerHTML = '<option value="">도시 선택</option>';
+        citySelect.disabled = true;
+    }
 
     const categoryCheckboxes = document.getElementById('categoryCheckboxes');
     categoryCheckboxes.innerHTML = '';
