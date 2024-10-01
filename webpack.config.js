@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './app.js', // Your main JS file
@@ -14,21 +15,16 @@ module.exports = {
         { from: 'styles', to: 'styles' },
         { from: 'favicon.ico', to: 'favicon.ico' },
         { from: 'manifest.json', to: 'manifest.json' },
-        { from: 'contents', to: 'contents' },
-        { from: 'api', to: 'api' },
-        { from: 'auth', to: 'auth' },
-        { from: 'pages', to: 'pages' },
-        { from: 'utils', to: 'utils' },
         { from: 'firebase-messaging-sw.js', to: 'firebase-messaging-sw.js' },
         { from: 'index.html', to: 'index.html' },
       ],
     }),
-    // new HtmlWebpackPlugin({
-    //   template: './index.html',
-	  //   filename: 'index.html',
-    //   inject: 'body',
-    //   scriptLoading: 'blocking'
-    // }),
+    new HtmlWebpackPlugin({
+      template: './index.html',
+	    filename: 'index.html',
+      inject: 'body',
+      scriptLoading: 'blocking'
+    })
   ],
   module: {
     rules: [
