@@ -81,6 +81,7 @@ export function PopulateRegions() {
 }
 
 export function PopulateCities(regionId) {
+    console.log('PopulateCities called with regionId:', regionId);
     const citySelect = document.getElementById('city');
     citySelect.innerHTML = '<option value="">도시 선택</option>';
     
@@ -91,13 +92,21 @@ export function PopulateCities(regionId) {
         citySelect.appendChild(option);
         citySelect.disabled = true;  // Disable selection as there's only one option
     } else {
-        cities[regionId].forEach(city => {
-            const option = document.createElement('option');
-            option.value = city;
-            option.textContent = city;
-            citySelect.appendChild(option);
-        });
-        citySelect.disabled = false;  // Enable selection for other regions
+        const citiesOfRegion = cities[regionId];
+        console.log('Cities of region:', citiesOfRegion);
+
+        if (Array.isArray(citiesOfRegion)) {
+            citiesOfRegion.forEach(city => {
+                const option = document.createElement('option');
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            });
+            citySelect.disabled = false;
+        } else {
+            console.error('Invalid cities data for region:', regionId);
+            citySelect.disabled = true;
+        }
     }
 }
 
