@@ -13,6 +13,8 @@ let myApplicationsCurrentSort = 'created_at';
 
 let currentPage = 1;
 
+let applicationDetailsModalInstance = null;
+
 export async function SetupMyApplicationsPage() {
     console.log('Setting up my applications page');
 
@@ -195,6 +197,14 @@ async function WithdrawApplication(applicationId) {
         }
 
         ShowSuccessMessage('지원이 성공적으로 철회되었습니다.', 3000);
+
+        // Hide the application details modal
+        if (applicationDetailsModalInstance) {
+            applicationDetailsModalInstance.hide();
+            // Reset the modal instance to null
+            applicationDetailsModalInstance = null;
+        }
+        
         await FetchAndDisplayMyApplications(currentPage);
     } catch (error) {
         console.error('Error withdrawing application:', error);
@@ -257,8 +267,8 @@ function ShowMyApplicationDetails(application) {
         </div>
     `;
 
-    const applicationDetailsModal = new bootstrap.Modal(document.getElementById('applicationDetailsModal'));
-    applicationDetailsModal.show();
+    applicationDetailsModalInstance = new bootstrap.Modal(document.getElementById('applicationDetailsModal'));
+    applicationDetailsModalInstance.show();
 
     // Add withdraw button if the application is still pending
     const modalFooter = document.querySelector('#applicationDetailsModal .modal-footer');
