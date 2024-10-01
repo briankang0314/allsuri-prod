@@ -27,7 +27,7 @@ export async function SetupMyProfilePage() {
     }
 }
 
-async function FetchUserProfile() {
+export async function FetchUserProfile() {
     try {
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/GetProfile', {
             method: 'POST',

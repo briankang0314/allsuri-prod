@@ -1,7 +1,8 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
+import { FetchUserProfile } from './myProfilePage.js';
 import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
-import { regions } from '../utils/constants.js';
+import { categories, regions } from '../utils/constants.js';
 
 
 
