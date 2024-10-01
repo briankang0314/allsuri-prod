@@ -55,6 +55,7 @@ export async function LoginByKakao() {
                 }
 
                 // Redirect to home page
+                window.history.pushState({}, '', '/home');
                 await FillTheBody('home');
             } else {
                 console.error('Login failed:', data);

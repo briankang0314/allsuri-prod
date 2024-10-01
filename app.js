@@ -18,6 +18,12 @@ document. addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        if (window.location.pathname === '/home') {
+            // User is logged in and should see the home page
+            await FillTheBody('home');
+            return;
+        }
+
 		if (!localStorage.getItem('user') || !localStorage.getItem('tokens')) { await FillTheBody('login'); return; }
         else { if (!await CheckProfileCompleteness()) {await FillTheBody('my-profile'); ShowIncompleteProfileWarning(); return;} }
 

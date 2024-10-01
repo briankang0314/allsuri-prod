@@ -2,7 +2,6 @@
   "name": "올수리",
   "short_name": "올수리",
   "version": "1.0.0",
-  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
