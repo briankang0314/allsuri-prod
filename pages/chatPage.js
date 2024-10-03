@@ -247,7 +247,14 @@ async function GetGroupChannel(channelUrl) {
 async function LoadMessages(channel) {
     console.log('LoadMessages called for channel:', channel);
     try {
-        const messageListParams = {};
+        const messageListParams = {
+            prevResultSize: 50, // Number of messages to retrieve before the timestamp
+            nextResultSize: 0,  // Number of messages to retrieve after the timestamp
+            isInclusive: true,  // Include the message at the timestamp
+            reverse: false,     // Messages will be in ascending order
+        };
+        console.log('Message list parameters:', messageListParams);
+
         const messages = await channel.getMessagesByTimestamp(Date.now(), messageListParams);
         console.log('Messages fetched:', messages.length);
 
