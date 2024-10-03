@@ -49,13 +49,22 @@
         }
     
         .channel-list {
+            display: none;
             width: 300px;
             border-right: 1px solid #dee2e6;
             overflow-y: auto;
-            display: flex;
             flex-direction: column;
             height: 100%;
         }
+
+        .channel-list.show {
+            display: flex;
+        }
+
+        .chat-area {
+            flex-grow: 1;
+        }
+
         #channelListContent {
             /* Ensure it can grow and overflow properly */
             flex: 1;
@@ -132,6 +141,7 @@
             max-width: 100%;
             word-wrap: break-word;
             margin-top: 5px;
+            margin-bottom: 5px;
         }
 
         .message-bubble.sent .message-content {
@@ -151,7 +161,19 @@
             display: block;
             text-align: right;
             font-size: 0.8rem;
-            margin-top: 5px;
+            color: #6c757d;
+            margin-bottom: 5px;  /* Optional: add margin below receipt text */
+        }
+
+        .sent-message-content {
+            background-color: #0d6efd;  /* Bootstrap primary color */
+            color: white;
+        }
+
+        /* Style for received messages */
+        .received-message-content {
+            background-color: #e9ecef;  /* Light gray */
+            color: black;
         }
     
         @media (max-width: 768px) {
@@ -204,9 +226,6 @@
         <main role="main">
             <div class="chat-container">
                 <div class="channel-list" id="channelList">
-                    <div class="p-2">
-                        <input type="text" id="searchInput" class="form-control" placeholder="채널 또는 메시지 검색">
-                    </div>
                     <div id="channelListContent" class="flex-grow-1 overflow-auto">
                         <!-- Channel list will be dynamically populated here -->
                     </div>
@@ -218,6 +237,10 @@
                         </div>
                     </div>
                     <div class="message-list" id="messageList">
+                        <div id="placeholderMessage" class="text-center text-muted my-5">
+                            <h3>채팅이 선택되지 않았습니다</h3>
+                            <p>메시지를 확인하기 위해서는 채팅을 선택해주세요.</p>
+                        </div>
                         <!-- Messages will be dynamically populated here -->
                     </div>
                     <div class="message-input">

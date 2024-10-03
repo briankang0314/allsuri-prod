@@ -23,6 +23,7 @@ export async function SetupChatPage() {
         // Assuming the user data is stored in localStorage
         const user = JSON.parse(localStorage.getItem('user'));
         console.log('Retrieved user from localStorage:', user);
+
         if (user) {
             try {
                 console.log('Connecting user:', user.user_id);
@@ -37,10 +38,13 @@ export async function SetupChatPage() {
                 console.error('Error connecting user:', error);
                 return;
             }
+
             AddChannelHandler();
             // await RegisterPushToken(); // Implement if necessary
             await LoadChannelList();
             setupEventListeners();
+            // Load messages with no channel selected
+            await LoadMessages(null);
         } else {
             console.warn('User not found in localStorage, redirecting to login page.');
             // Redirect to login if user is not authenticated
@@ -50,6 +54,7 @@ export async function SetupChatPage() {
 
     function setupEventListeners() {
         console.log('Setting up event listeners');
+        
         // Sending a message
         const sendButton = document.getElementById('sendButton');
         console.log('sendButton element:', sendButton);
@@ -70,22 +75,23 @@ export async function SetupChatPage() {
     
         // Channel selection
         const channelListElement = document.getElementById('channelListContent');
+        const channelList = document.querySelector('.channel-list');
         console.log('channelListElement:', channelListElement);
-        if (channelListElement) {
+        console.log('channelList:', channelList);
+        if (channelListElement && channelList) {
             channelListElement.addEventListener('click', async (event) => {
-                console.log('Channel list item clicked:', event.target);
                 const channelItem = event.target.closest('.channel-item');
                 if (channelItem) {
                     const channelUrl = channelItem.dataset.channelUrl;
-                    console.log('Selected channel URL:', channelUrl);
                     await OnChannelSelected(channelUrl);
                     channelList.classList.remove('show'); // Hide the channel list
                 }
             });
         } else {
-            console.warn('Channel list element not found.');
+            console.warn('Channel list element or channel list not found.');
         }
 
+        // Logo link
         const logoLink = document.getElementById('logo-link');
         console.log('logoLink:', logoLink);
         if (logoLink) {
@@ -110,14 +116,15 @@ export async function SetupChatPage() {
             console.warn('Back button not found.');
         }
 
+        // Toggle channels button
         const toggleChannelsBtn = document.getElementById('toggle-channels-btn');
-        const channelList = document.querySelector('.channel-list');
+        const channelListToggle = document.querySelector('.channel-list');
         console.log('toggleChannelsBtn:', toggleChannelsBtn);
-        console.log('channelList:', channelList);
-        if (toggleChannelsBtn && channelList) {
+        console.log('channelListToggle:', channelListToggle);
+        if (toggleChannelsBtn && channelListToggle) {
             toggleChannelsBtn.addEventListener('click', () => {
                 console.log('Toggle channels button clicked.');
-                channelList.classList.toggle('show');
+                channelListToggle.classList.toggle('show');
             });
         } else {
             console.warn('Toggle channels button or channel list not found.');
@@ -186,7 +193,7 @@ async function LoadChannelList() {
             lastMessageElement.textContent = channel.lastMessage ? channel.lastMessage.message : 'No messages yet';
             console.log('Last message set:', lastMessageElement.textContent);
 
-            lastMessageTimeElement.textContent = channel.lastMessage ? new Date(channel.lastMessage.createdAt).toLocaleTimeString() : '';
+            lastMessageTimeElement.textContent = channel.lastMessage ? new Date(channel.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
             console.log('Last message time set:', lastMessageTimeElement.textContent);
 
             if (channel.unreadMessageCount > 0) {
@@ -245,34 +252,49 @@ async function GetGroupChannel(channelUrl) {
 }
 
 async function LoadMessages(channel) {
-    console.log('LoadMessages called for channel:', channel);
-    try {
-        const messageListParams = {
-            prevResultSize: 50, // Number of messages to retrieve before the timestamp
-            nextResultSize: 0,  // Number of messages to retrieve after the timestamp
-            isInclusive: true,  // Include the message at the timestamp
-            reverse: false,     // Messages will be in ascending order
-        };
-        console.log('Message list parameters:', messageListParams);
+	console.log('LoadMessages called for channel:', channel);
+	const messageListElement = document.getElementById('messageList');
+	const placeholderMessage = document.getElementById('placeholderMessage');
 
-        const messages = await channel.getMessagesByTimestamp(Date.now(), messageListParams);
-        console.log('Messages fetched:', messages.length);
+	if (!channel) {
+		console.log('No channel selected, showing placeholder message.');
+		// Clear message list and show placeholder
+		messageListElement.innerHTML = '';
+		messageListElement.appendChild(placeholderMessage);
+		placeholderMessage.style.display = 'block';
+		return;
+	} else {
+		// Hide placeholder message
+		if (placeholderMessage) {
+			placeholderMessage.style.display = 'none';
+		}
+	}
 
-        const messageListElement = document.getElementById('messageList');
-        console.log('messageListElement:', messageListElement);
-        messageListElement.innerHTML = '';
+	try {
+		const messageListParams = {
+			prevResultSize: 50, // Number of messages to retrieve before the timestamp
+			nextResultSize: 0,  // Number of messages to retrieve after the timestamp
+			isInclusive: true,  // Include the message at the timestamp
+			reverse: false,     // Messages will be in ascending order
+		};
+		console.log('Message list parameters:', messageListParams);
 
-        messages.forEach(message => {
-            console.log('Displaying message:', message);
-            DisplayMessage(message);
-        });
+		const messages = await channel.getMessagesByTimestamp(Date.now(), messageListParams);
+		console.log('Messages fetched:', messages.length);
 
-        // Scroll to the bottom
-        messageListElement.scrollTop = messageListElement.scrollHeight;
-        console.log('Message list scrolled to bottom.');
-    } catch (error) {
-        console.error('Error loading messages:', error);
-    }
+		messageListElement.innerHTML = '';
+
+		messages.forEach(message => {
+			console.log('Displaying message:', message);
+			DisplayMessage(message);
+		});
+
+		// Scroll to the bottom
+		messageListElement.scrollTop = messageListElement.scrollHeight;
+		console.log('Message list scrolled to bottom.');
+	} catch (error) {
+		console.error('Error loading messages:', error);
+	}
 }
 
 function DisplayMessage(message) {
@@ -288,12 +310,12 @@ function DisplayMessage(message) {
     const messageTimeElement = messageBubble.querySelector('.message-time');
     const messageAvatarElement = messageBubble.querySelector('.message-avatar');
 
-    messageContentElement.textContent = message.message;
-    messageSenderElement.textContent = message.sender.nickname || 'Unknown';
-    messageTimeElement.textContent = new Date(message.createdAt).toLocaleTimeString();
+    messageContentElement.textContent = message.message || '';
+    messageSenderElement.textContent = (message.sender && message.sender.nickname) || 'Unknown';
+    messageTimeElement.textContent = new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     console.log('Message content, sender, time set.');
 
-    if (message.sender.profileUrl) {
+    if (message.sender && message.sender.profileUrl) {
         messageAvatarElement.src = message.sender.profileUrl;
         console.log('Message avatar set to sender profile URL.');
     } else {
@@ -304,20 +326,22 @@ function DisplayMessage(message) {
     const messageReceiptElement = document.createElement('small');
     messageReceiptElement.classList.add('message-receipt', 'text-muted');
 
-    if (message.sender.userId === sb.currentUser.userId) {
-        const isDelivered = currentChannel.getReadReceipt(message);
-        messageReceiptElement.textContent = isDelivered ? 'Read' : 'Sent';
-        messageBubbleElement.appendChild(messageReceiptElement);
+    if (message.sender && message.sender.userId === sb.currentUser.userId) {
+        const unreadCount = currentChannel ? currentChannel.getUnreadMemberCount(message) : -1;
+        messageReceiptElement.textContent = unreadCount === 0 ? 'Read' : 'Sent';
+        messageContentElement.parentNode.appendChild(messageReceiptElement);
         messageBubbleElement.classList.add('sent');
+		messageContentElement.classList.add('sent-message-content');
         // Move avatar to the right for sent messages
         messageBubbleElement.classList.add('align-self-end');
         console.log('Message bubble styled as sent message.');
     } else {
         messageBubbleElement.classList.add('received');
+		messageContentElement.classList.add('received-message-content');
         console.log('Message bubble styled as received message.');
     }
 
-    messageListElement.appendChild(messageBubble);
+    messageListElement.appendChild(messageBubbleElement);
     // Scroll to the bottom
     messageListElement.scrollTop = messageListElement.scrollHeight;
     console.log('Message bubble appended to message list and scrolled to bottom.');
@@ -327,18 +351,22 @@ async function SendMessage(channel, messageText) {
     console.log('SendMessage called with messageText:', messageText);
     try {
         const params = { message: messageText };
-        const message = await channel.sendUserMessage(params);
-        console.log('Message sent:', message.message);
+        const pendingMessage = channel.sendUserMessage(params);
 
-        // Display the sent message
-        DisplayMessage(message);
+        pendingMessage.onSucceeded((message) => {
+            console.log('Message sent successfully:', message);
 
-        // Scroll to the bottom
-        const messageListElement = document.getElementById('messageList');
-        messageListElement.scrollTop = messageListElement.scrollHeight;
-        console.log('Message list scrolled to bottom after sending message.');
+            // Display the sent message
+            DisplayMessage(message);
 
-        return message;
+            // Scroll to the bottom
+            const messageListElement = document.getElementById('messageList');
+            messageListElement.scrollTop = messageListElement.scrollHeight;
+            console.log('Message list scrolled to bottom after sending message.');
+        }).onFailed((error) => {
+            console.error('Error sending message:', error);
+        });
+
     } catch (error) {
         console.error('Error sending message:', error);
     }
