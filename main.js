@@ -11,11 +11,14 @@ import { SetupPostOrderPage } from './pages/postOrderPage.js';
 import { SetupApplyForOrderPage } from './pages/applyForOrderPage.js';
 import { SetupChatPage } from './pages/chatPage.js';
 import { ShowErrorMessage } from './utils/helpers.js';
+import { ShowLoadingSpinner, HideLoadingSpinner } from './utils/loadingSpinner.js';
 
 
 
 export async function FillTheBody(contentName, params = {}) {
     try {
+        await ShowLoadingSpinner();
+
         // Fetch and render the page content
         const response = await fetch(`/contents/${contentName}.html`);
         if (!response.ok) {
@@ -24,7 +27,12 @@ export async function FillTheBody(contentName, params = {}) {
         const content = await response.text();
 
         const sanitizedContent = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-        document.body.innerHTML = sanitizedContent;
+
+        const contentContainer = document.getElementById('main-content');
+        if (!contentContainer) {
+            throw new Error('Main content container not found in the DOM');
+        }
+        contentContainer.innerHTML = sanitizedContent;
 
         await new Promise(resolve => setTimeout(resolve));
 
@@ -69,8 +77,11 @@ export async function FillTheBody(contentName, params = {}) {
             default:
                 console.error(`Unknown content name: ${contentName}`);
         }
+
+        HideLoadingSpinner();
     } catch (error) {
         console.error(`Error loading ${contentName}:`, error);
+        HideLoadingSpinner();
         ShowErrorMessage(`${contentName} 페이지 로딩 중 오류가 발생했습니다. 다시 시도해주세요.`);
     }
 }

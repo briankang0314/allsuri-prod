@@ -18,6 +18,7 @@ module.exports = {
         { from: 'favicon.ico', to: 'favicon.ico' },
         { from: 'manifest.json', to: 'manifest.json' },
         { from: 'contents', to: 'contents' },
+        { from: 'components', to: 'components' },
         { from: 'api', to: 'api' },
         { from: 'auth', to: 'auth' },
         { from: 'pages', to: 'pages' },

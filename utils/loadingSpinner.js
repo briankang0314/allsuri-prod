@@ -37,7 +37,7 @@ export async function ShowLoadingSpinner() {
 	} catch (error) {
 	  console.error('Error fetching/loading spinner HTML:', error);
 	}
-  }
+}
   
 export function HideLoadingSpinner() {
 	console.log('HideLoadingSpinner function called');

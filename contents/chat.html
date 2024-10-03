@@ -1,114 +1,460 @@
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>채팅</title>
+    <title>올수리 - 채팅</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
     <style>
-        body {
+        /* Ensure the root elements take up the full viewport height */
+        html, body {
+            height: 100%;
             margin: 0;
-            font-family: Arial, sans-serif;
+            padding: 0;
+        }
+    
+        /* Main container setup */
+        .container-fluid {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 100%;
         }
+    
+        /* Header stays at the top */
         .header {
-            background-color: #f8f9fa;
-            padding: 10px 20px;
+            background-color: var(--secondary-bg-color);
             border-bottom: 1px solid #dee2e6;
+            box-shadow: var(--primary-shadow);
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
-        .logo {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
-        }
-        .main-content {
+    
+        .header-left {
             display: flex;
-            flex: 1;
-            overflow: hidden;
+            align-items: center;
         }
-        .channel-list {
-            width: 250px;
-            border-right: 1px solid #ccc;
-            overflow-y: auto;
+
+        .header-right {
+            display: flex;
+            align-items: center;
         }
-        .channel-item {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
+    
+        .logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
         }
-        .channel-item:hover {
-            background-color: #f0f0f0;
+    
+        .logo:hover {
+            transform: scale(1.1);
         }
-        .chat-area {
+
+        #channelListBtn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 24px;
+            background-color: #007bff; /* Bootstrap primary color */
+            color: white;
+            border: none;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #channelListBtn i {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
+        #channelListBtn:hover {
+            background-color: #0056b3; /* Darker shade for hover */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        #channelListBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Main content area fills remaining space */
+        .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 0; /* Allow flex items to shrink properly */
+            overflow: hidden;
         }
-        .message-list {
-            flex: 1;
+    
+        /* Channel List Styles */
+        #channelListOverlay {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: var(--secondary-bg-color);
+            box-shadow: var(--primary-shadow);
             overflow-y: auto;
-            padding: 10px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+    
+        #channelListOverlay.active {
+            left: 0;
+        }
+    
+        .channel-list-header {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+        .channel-list-header h5 {
+            margin: 0;
+        }
+    
+        .channel-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+    
+        .channel-item:hover {
+            background-color: #f0f0f0;
+        }
+    
+        .channel-item.active {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+    
+        /* Chat Area Styles */
+        .chat-area {
+            flex: 1 1 0%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 0; /* Allow flex items to shrink properly */
+        }
+    
+        /* Message list takes available space and is scrollable */
+        .message-list {
+            flex: 1 1 0%;
+            overflow-y: auto;
+            padding: 15px;
+            padding-bottom: 20px;
             background-color: #fafafa;
+            min-height: 0; /* Allow flex items to shrink properly */
+            display: flex;
+            flex-direction: column;
+            -webkit-overflow-scrolling: touch; /* Improve scrolling on mobile devices */
         }
+    
         .message-item {
-            margin-bottom: 15px;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            margin-bottom: 8px;
+            max-width: 80%;
         }
+
+        /* Align messages sent by the current user to the right */
+        .message-item.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-item.sent .message-content {
+            margin-right: 0;
+            margin-left: 8px;
+        }
+
+        /* Align messages received from others to the left */
+        .message-item.received {
+            align-self: flex-start;
+        }
+    
         .message-sender {
             font-weight: bold;
             margin-bottom: 5px;
         }
+
         .message-content {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            margin-right: 8px;
+            max-width: calc(100% - 50px); /* Adjust based on timestamp width */
         }
+    
+        .message-content.sent {
+            background-color: #d1e7dd;
+            align-self: flex-end;
+        }
+    
+        .message-content.received {
+            background-color: #ffffff;
+            align-self: flex-start;
+        }
+
+        .message-content.sent,
+        .message-content.received {
+            margin: 0;
+        }
+
+        /* Style for the message timestamp */
+        .message-timestamp {
+            font-size: 11px;
+            color: #999;
+            white-space: nowrap;
+        }
+
+        /* Position the timestamp logically */
+        .message-item.sent .message-timestamp {
+            align-self: flex-end;
+        }
+
+        .message-item.received .message-timestamp {
+            align-self: flex-start;
+        }
+    
+        /* Message input area stays at the bottom */
         .message-input {
             display: flex;
             border-top: 1px solid #ccc;
+            padding: 20px;
+            background-color: var(--secondary-bg-color);
+            flex-shrink: 0; /* Ensure input doesn't shrink */
         }
+    
         #messageInput {
             flex: 1;
-            padding: 10px;
-            border: none;
-            font-size: 16px;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 18px;
         }
+    
         #sendButton {
-            padding: 10px 20px;
+            padding: 15px 25px;
             border: none;
-            background: #007BFF;
+            background: #007bff;
             color: white;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+            border-radius: 20px;
         }
+    
         #sendButton:hover {
             background: #0056b3;
+        }
+    
+        /* Overlay Background */
+        #overlayBackground {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+        }
+    
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            html, body {
+                overflow: hidden;
+            }
+
+            .container-fluid {
+                display: flex;
+                flex-direction: column;
+                height: 100vh; /* Use viewport height */
+            }
+
+            .main-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .chat-area {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .message-list {
+                flex: 1;
+                overflow-y: auto;
+            }
+    
+            .header {
+                padding: 10px 15px;
+            }
+    
+            .header h1 {
+                font-size: 1.25rem;
+            }
+    
+            .logo {
+                width: 30px;
+                height: 30px;
+            }
+
+            .message-input {
+                position: sticky;
+                bottom: 0;
+                background-color: var(--secondary-bg-color);
+                padding: 10px;
+                z-index: 10;
+                margin-bottom: -10px; /* Move the input section up by 10 pixels */
+            }
+
+            #messageInput {
+                font-size: 16px; /* Minimum font size to prevent zoom on iOS */
+                padding: 10px;
+            }
+    
+            #sendButton {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+    
+            .message-content {
+                max-width: 85%;
+            }
+    
+            #channelListOverlay {
+                width: 100%;
+                left: -100%;
+            }
+    
+            #channelListOverlay.active {
+                left: 0;
+            }
+        }
+    
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding: 0 10px;
+            }
+
+            .header {
+                padding: 10px 15px;
+            }
+    
+            .header h1 {
+                font-size: 1rem;
+            }
+    
+            .message-list {
+                padding: 10px;
+            }
+    
+            .message-input {
+                padding: 5px;
+            }
+    
+            #messageInput {
+                font-size: 12px;
+                padding: 6px;
+            }
+    
+            #sendButton {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+    
+            .channel-item {
+                padding: 8px 10px;
+            }
+
+            #channelListBtn {
+                padding: 8px;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+            }
+
+            #channelListBtn i {
+                margin-right: 0;
+            }
+
+            #channelListBtn span {
+                display: none;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .message-item {
+                max-width: 90%;
+            }
+            
+            .message-content {
+                font-size: 14px;
+            }
+            
+            .message-timestamp {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="d-flex align-items-center">
-            <a href="#" id="logo-link">
-                <img src="/favicon.ico" alt="올수리 로고" class="logo">
-            </a>
-            <h1 class="h3 fw-bold m-0">채팅</h1>
-        </div>
-    </header>
-    <div class="main-content">
-        <div class="channel-list">
-            <div id="channelListContent">
-                <!-- Channel list will be populated here -->
+    <div class="container-fluid">
+        <header class="header">
+            <div class="header-left">
+                <a href="#" id="logo-link">
+                    <img src="/favicon.ico" alt="올수리 로고" class="logo">
+                </a>
+                <h1 class="h3 fw-bold m-0">채팅</h1>
             </div>
-        </div>
-        <div class="chat-area">
-            <div class="message-list" id="messageList">
-                <!-- Messages will be displayed here -->
+            <div class="header-right">
+                <button id="channelListBtn" class="btn">
+                    <i class="bi bi-list"></i>
+                    <span>채널 목록</span>
+                </button>
             </div>
-            <div class="message-input">
-                <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" />
-                <button id="sendButton">보내기</button>
+        </header>
+        <div class="main-content">
+            <!-- Channel List Overlay -->
+            <div id="channelListOverlay">
+                <div class="channel-list-header">
+                    <h5>채널 목록</h5>
+                </div>
+                <!-- Channel List Content -->
+                <div id="channelListContent">
+                    <!-- Channels will be populated here -->
+                </div>
+            </div>
+
+            <!-- Overlay Background -->
+            <div id="overlayBackground"></div>
+
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <div class="message-list" id="messageList">
+                    <!-- Messages will be displayed here -->
+                </div>
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" />
+                    <button id="sendButton"><i class="bi bi-send"></i></button>
+                </div>
             </div>
         </div>
     </div>
