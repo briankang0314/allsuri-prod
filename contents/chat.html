@@ -54,6 +54,12 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            height: 100%;
+        }
+        #channelListContent {
+            /* Ensure it can grow and overflow properly */
+            flex: 1;
+            overflow-y: auto;
         }
     
         .chat-area {

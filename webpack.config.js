@@ -37,9 +37,9 @@ module.exports = {
       {
         test: /\.(js)$/,
         exclude: /node_modules/,
-        use: 'babel-loader', // Transpile JS files using Babel
+        use: 'babel-loader', 
       },
     ],
   },
-  mode: 'production', // or 'development' for unminified code
+  mode: 'production',
 };

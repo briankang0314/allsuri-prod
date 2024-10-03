@@ -11,15 +11,30 @@ const sb = SendbirdChat.init({
 
 let currentChannel = null;
 
+
+
 export async function SetupChatPage() {
+	console.log('SetupChatPage called');
 	// Setup the chat page
     await initializeChat();
     
     async function initializeChat() {
         // Assuming the user data is stored in localStorage
         const user = JSON.parse(localStorage.getItem('user'));
+		console.log('Retrieved user from localStorage:', user);
         if (user) {
-            await ConnectUser(user.id, user.nickname, user.profile_image_url);
+			try {
+				console.log('Connecting user:', user.user_id);
+				const connectedUser = await sb.connect(user.user_id);
+				await sb.updateCurrentUserInfo({ 
+					nickname: user.nickname, 
+					profileUrl: user.thumbnail_image_url,
+				});
+				console.log(`Connected as ${user.nickname}`);
+			} catch (error) {
+				console.error('Error connecting user:', error);
+				return;
+			}
             AddChannelHandler();
             // await RegisterPushToken(); // Implement if necessary
             await LoadChannelList();
@@ -52,66 +67,87 @@ export async function SetupChatPage() {
                 if (channelItem) {
                     const channelUrl = channelItem.dataset.channelUrl;
                     await OnChannelSelected(channelUrl);
+					const channelList = document.querySelector('.channel-list');
+					channelList.classList.remove('show');
                 }
             });
         }
+
+		const logoLink = document.getElementById('logo-link');
+		if (logoLink) {
+			logoLink.addEventListener('click', async (e) => {
+				e.preventDefault();
+				await FillTheBody('home');
+			});
+		}
     
         // Back button
         const backButton = document.getElementById('back-btn');
         if (backButton) {
             backButton.addEventListener('click', async () => await FillTheBody('home'));
         }
-    }
 
-	
-}
-
-async function ConnectUser(userId, nickname, profileUrl) {
-	try {
-		const user = await sb.connect(userId);
-		await sb.updateCurrentUserInfo({ 
-			nickname, 
-			profileUrl,
-		});
-		console.log(`Connected as ${user.nickname}`);
-		return user;
-	} catch (error) {
-		console.error('Error connecting user:', error);
+		const toggleChannelsBtn = document.getElementById('toggle-channels-btn');
+		const channelList = document.querySelector('.channel-list');
+		if (toggleChannelsBtn && channelList) {
+			toggleChannelsBtn.addEventListener('click', () => {
+				channelList.classList.toggle('show');
+			});
+		}
 	}
 }
 
 async function LoadChannelList() {
+	console.log('Starting LoadChannelList function');
 	try {
 		const channelListQuery = sb.groupChannel.createMyGroupChannelListQuery();
 		channelListQuery.limit = 20; // Number of channels to load
+		channelListQuery.includeEmpty = true;
+		console.log('Channel list query created with limit:', channelListQuery.limit);
+
 		const channels = await channelListQuery.next();
+		console.log('Channels fetched:', channels.length);
 
 		const channelListElement = document.getElementById('channelListContent');
 		channelListElement.innerHTML = '';
 
-		channels.forEach(channel => {
+		channels.forEach((channel, index) => {
+			console.log(`Processing channel ${index + 1}:`, channel);
 			const channelItemTemplate = document.getElementById('channelItemTemplate');
-			const channelItem = channelItemTemplate.content.cloneNode(true);
+			console.log('Channel item template found:', channelItemTemplate);
+			const channelItem = channelItemTemplate.content.firstElementChild.cloneNode(true);
 
-			const channelItemElement = channelItem.querySelector('.channel-item');
+			const channelItemElement = channelItem; // It's already the '.channel-item' element
 			channelItemElement.dataset.channelUrl = channel.url;
+			console.log('Channel URL set:', channel.url);
 
-			const channelNameElement = channelItem.querySelector('.channel-name');
-			const lastMessageElement = channelItem.querySelector('.last-message');
-			const lastMessageTimeElement = channelItem.querySelector('.last-message-time');
-			const unreadCountElement = channelItem.querySelector('.unread-count');
+			const channelNameElement = channelItemElement.querySelector('.channel-name');
+			const lastMessageElement = channelItemElement.querySelector('.last-message');
+			const lastMessageTimeElement = channelItemElement.querySelector('.last-message-time');
+			const unreadCountElement = channelItemElement.querySelector('.unread-count');
 
 			channelNameElement.textContent = channel.name || 'No Name';
+			console.log('Channel name set:', channelNameElement.textContent);
+
 			lastMessageElement.textContent = channel.lastMessage ? channel.lastMessage.message : '';
+			console.log('Last message set:', lastMessageElement.textContent);
+
 			lastMessageTimeElement.textContent = channel.lastMessage ? new Date(channel.lastMessage.createdAt).toLocaleTimeString() : '';
+			console.log('Last message time set:', lastMessageTimeElement.textContent);
+
 			if (channel.unreadMessageCount > 0) {
 				unreadCountElement.textContent = channel.unreadMessageCount;
+				console.log('Unread count set:', unreadCountElement.textContent);
 			} else {
 				unreadCountElement.style.display = 'none';
+				console.log('Unread count hidden');
 			}
 
-			channelListElement.appendChild(channelItem);
+			channelListElement.appendChild(channelItemElement);
+			console.log('Current channel list HTML:', channelListElement.innerHTML);
 		});
+
+		console.log('Channel list loading completed');
 	} catch (error) {
 		console.error('Error loading channel list:', error);
 	}
