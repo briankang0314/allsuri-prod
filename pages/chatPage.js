@@ -98,59 +98,77 @@ export async function SetupChatPage() {
 }
 
 async function LoadChannelList() {
-	console.log('Starting LoadChannelList function');
-	try {
-		const channelListQuery = sb.groupChannel.createMyGroupChannelListQuery();
-		channelListQuery.limit = 20; // Number of channels to load
-		channelListQuery.includeEmpty = true;
-		console.log('Channel list query created with limit:', channelListQuery.limit);
+    console.log('Starting LoadChannelList function');
+    try {
+        const channelListQuery = sb.groupChannel.createMyGroupChannelListQuery();
+        channelListQuery.limit = 20; // Number of channels to load
+        channelListQuery.includeEmpty = true;
+        console.log('Channel list query created with limit:', channelListQuery.limit);
 
-		const channels = await channelListQuery.next();
-		console.log('Channels fetched:', channels.length);
+        const channels = await channelListQuery.next();
+        console.log('Channels fetched:', channels.length);
 
-		const channelListElement = document.getElementById('channelListContent');
-		channelListElement.innerHTML = '';
+        const channelListElement = document.getElementById('channelListContent');
+        channelListElement.innerHTML = '';
 
-		channels.forEach((channel, index) => {
-			console.log(`Processing channel ${index + 1}:`, channel);
-			const channelItemTemplate = document.getElementById('channelItemTemplate');
-			console.log('Channel item template found:', channelItemTemplate);
-			const channelItem = channelItemTemplate.content.firstElementChild.cloneNode(true);
+        channels.forEach((channel, index) => {
+            console.log(`Processing channel ${index + 1}:`, channel);
+            const channelItemTemplate = document.getElementById('channelItemTemplate');
+            console.log('Channel item template found:', channelItemTemplate);
+            const channelItem = channelItemTemplate.content.firstElementChild.cloneNode(true);
 
-			const channelItemElement = channelItem; // It's already the '.channel-item' element
-			channelItemElement.dataset.channelUrl = channel.url;
-			console.log('Channel URL set:', channel.url);
+            const channelItemElement = channelItem; // It's already the '.channel-item' element
+            channelItemElement.dataset.channelUrl = channel.url;
+            console.log('Channel URL set:', channel.url);
 
-			const channelNameElement = channelItemElement.querySelector('.channel-name');
-			const lastMessageElement = channelItemElement.querySelector('.last-message');
-			const lastMessageTimeElement = channelItemElement.querySelector('.last-message-time');
-			const unreadCountElement = channelItemElement.querySelector('.unread-count');
+            const channelAvatarElement = channelItemElement.querySelector('.channel-avatar');
+            const channelNameElement = channelItemElement.querySelector('.channel-name');
+            const lastMessageElement = channelItemElement.querySelector('.last-message');
+            const lastMessageTimeElement = channelItemElement.querySelector('.last-message-time');
+            const unreadCountElement = channelItemElement.querySelector('.unread-count');
 
-			channelNameElement.textContent = channel.name || 'No Name';
-			console.log('Channel name set:', channelNameElement.textContent);
+            // Get other participants' info
+            const otherMembers = channel.members.filter(member => member.userId !== sb.currentUser.userId);
 
-			lastMessageElement.textContent = channel.lastMessage ? channel.lastMessage.message : '';
-			console.log('Last message set:', lastMessageElement.textContent);
+            // Set channel avatar (using the first other member's profile image)
+            if (otherMembers.length > 0 && otherMembers[0].profileUrl) {
+                channelAvatarElement.src = otherMembers[0].profileUrl;
+            } else {
+                channelAvatarElement.src = '/path/to/default/avatar.png'; // Replace with your default avatar path
+            }
 
-			lastMessageTimeElement.textContent = channel.lastMessage ? new Date(channel.lastMessage.createdAt).toLocaleTimeString() : '';
-			console.log('Last message time set:', lastMessageTimeElement.textContent);
+            // Set a user-friendly channel name (e.g., other participants' nicknames)
+            if (channel.name && channel.name.trim() !== '') {
+                channelNameElement.textContent = channel.name;
+            } else if (otherMembers.length > 0) {
+                channelNameElement.textContent = otherMembers.map(member => member.nickname || 'Unknown').join(', ');
+            } else {
+                channelNameElement.textContent = 'No Members';
+            }
+            console.log('Channel name set:', channelNameElement.textContent);
 
-			if (channel.unreadMessageCount > 0) {
-				unreadCountElement.textContent = channel.unreadMessageCount;
-				console.log('Unread count set:', unreadCountElement.textContent);
-			} else {
-				unreadCountElement.style.display = 'none';
-				console.log('Unread count hidden');
-			}
+            lastMessageElement.textContent = channel.lastMessage ? channel.lastMessage.message : 'No messages yet';
+            console.log('Last message set:', lastMessageElement.textContent);
 
-			channelListElement.appendChild(channelItemElement);
-			console.log('Current channel list HTML:', channelListElement.innerHTML);
-		});
+            lastMessageTimeElement.textContent = channel.lastMessage ? new Date(channel.lastMessage.createdAt).toLocaleTimeString() : '';
+            console.log('Last message time set:', lastMessageTimeElement.textContent);
 
-		console.log('Channel list loading completed');
-	} catch (error) {
-		console.error('Error loading channel list:', error);
-	}
+            if (channel.unreadMessageCount > 0) {
+                unreadCountElement.textContent = channel.unreadMessageCount;
+                console.log('Unread count set:', unreadCountElement.textContent);
+            } else {
+                unreadCountElement.style.display = 'none';
+                console.log('Unread count hidden');
+            }
+
+            channelListElement.appendChild(channelItemElement);
+            console.log('Current channel list HTML:', channelListElement.innerHTML);
+        });
+
+        console.log('Channel list loading completed');
+    } catch (error) {
+        console.error('Error loading channel list:', error);
+    }
 }
 
 async function OnChannelSelected(channelUrl) {
@@ -184,7 +202,7 @@ async function LoadMessages(channel) {
 		messageListElement.innerHTML = '';
 
 		messages.forEach(message => {
-			displayMessage(message);
+			DisplayMessage(message);
 		});
 
 		// Scroll to the bottom
@@ -194,27 +212,37 @@ async function LoadMessages(channel) {
 	}
 }
 
-function displayMessage(message) {
+function DisplayMessage(message) {
 	const messageListElement = document.getElementById('messageList');
-	const messageBubbleTemplate = document.getElementById('messageBubbleTemplate');
-	const messageBubble = messageBubbleTemplate.content.cloneNode(true);
+    const messageBubbleTemplate = document.getElementById('messageBubbleTemplate');
+    const messageBubble = messageBubbleTemplate.content.cloneNode(true);
 
-	const messageBubbleElement = messageBubble.querySelector('.message-bubble');
-	const messageContentElement = messageBubble.querySelector('.message-content');
-	const messageSenderElement = messageBubble.querySelector('.message-sender');
-	const messageTimeElement = messageBubble.querySelector('.message-time');
+    const messageBubbleElement = messageBubble.querySelector('.message-bubble');
+    const messageContentElement = messageBubble.querySelector('.message-content');
+    const messageSenderElement = messageBubble.querySelector('.message-sender');
+    const messageTimeElement = messageBubble.querySelector('.message-time');
+    const messageAvatarElement = messageBubble.querySelector('.message-avatar');
 
-	messageContentElement.textContent = message.message;
-	messageSenderElement.textContent = message.sender.nickname || 'Unknown';
-	messageTimeElement.textContent = new Date(message.createdAt).toLocaleTimeString();
+    messageContentElement.textContent = message.message;
+    messageSenderElement.textContent = message.sender.nickname || 'Unknown';
+    messageTimeElement.textContent = new Date(message.createdAt).toLocaleTimeString();
 
-	if (message.sender.userId === sb.currentUser.userId) {
-		messageBubbleElement.classList.add('sent');
-	} else {
-		messageBubbleElement.classList.add('received');
-	}
+    if (message.sender.profileUrl) {
+        messageAvatarElement.src = message.sender.profileUrl;
+    } else {
+        messageAvatarElement.src = '/path/to/default/avatar.png'; // Replace with your default avatar path
+    }
 
-	messageListElement.appendChild(messageBubble);
+    if (message.sender.userId === sb.currentUser.userId) {
+        messageBubbleElement.classList.add('sent');
+        // Move avatar to the right for sent messages
+        messageBubbleElement.classList.add('align-self-end');
+    } else {
+        messageBubbleElement.classList.add('received');
+    }
+
+    messageListElement.appendChild(messageBubble);
+    messageListElement.scrollTop = messageListElement.scrollHeight;
 }
 
 async function SendMessage(channel, messageText) {
@@ -224,7 +252,7 @@ async function SendMessage(channel, messageText) {
 		console.log('Message sent:', message.message);
 
 		// Display the sent message
-		displayMessage(message);
+		DisplayMessage(message);
 
 		// Scroll to the bottom
 		const messageListElement = document.getElementById('messageList');
@@ -245,7 +273,7 @@ function AddChannelHandler() {
 
 		if (currentChannel && channel.url === currentChannel.url) {
 			// Display the received message
-			displayMessage(message);
+			DisplayMessage(message);
 
 			// Scroll to the bottom
 			const messageListElement = document.getElementById('messageList');
