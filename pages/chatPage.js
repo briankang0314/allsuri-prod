@@ -61,17 +61,16 @@ export async function SetupChatPage() {
     
         // Channel selection
         const channelListElement = document.getElementById('channelListContent');
-        if (channelListElement) {
-            channelListElement.addEventListener('click', async (event) => {
-                const channelItem = event.target.closest('.channel-item');
-                if (channelItem) {
-                    const channelUrl = channelItem.dataset.channelUrl;
-                    await OnChannelSelected(channelUrl);
-					const channelList = document.querySelector('.channel-list');
-					channelList.classList.remove('show');
-                }
-            });
-        }
+		if (channelListElement) {
+			channelListElement.addEventListener('click', async (event) => {
+				const channelItem = event.target.closest('.channel-item');
+				if (channelItem) {
+					const channelUrl = channelItem.dataset.channelUrl;
+					await OnChannelSelected(channelUrl);
+					channelList.classList.remove('show'); // Hide the channel list
+				}
+			});
+		}
 
 		const logoLink = document.getElementById('logo-link');
 		if (logoLink) {
@@ -177,20 +176,26 @@ async function OnChannelSelected(channelUrl) {
 }
 
 async function GetGroupChannel(channelUrl) {
-	try {
-		const channel = await sb.groupChannel.getChannel(channelUrl);
-		console.log('Group channel fetched:', channel.url);
+    try {
+        const channel = await sb.groupChannel.getChannel(channelUrl);
+        console.log('Group channel fetched:', channel.url);
 
-		// Update current channel info in UI
-		const currentChannelInfo = document.getElementById('currentChannelInfo');
-		if (currentChannelInfo) {
-			currentChannelInfo.textContent = channel.name || 'No Name';
-		}
+        // Update current channel info in UI
+        const currentChannelInfo = document.getElementById('currentChannelInfo');
+        if (currentChannelInfo) {
+            // Display channel name and participant count
+            const channelName = channel.name || 'No Name';
+            const participantCount = channel.memberCount || 0;
+            currentChannelInfo.innerHTML = `
+                <h5 class="mb-0">${channelName}</h5>
+                <small class="text-muted">${participantCount} participants</small>
+            `;
+        }
 
-		return channel;
-	} catch (error) {
-		console.error('Error fetching group channel:', error);
-	}
+        return channel;
+    } catch (error) {
+        console.error('Error fetching group channel:', error);
+    }
 }
 
 async function LoadMessages(channel) {
@@ -233,7 +238,13 @@ function DisplayMessage(message) {
         messageAvatarElement.src = '/path/to/default/avatar.png'; // Replace with your default avatar path
     }
 
+	const messageReceiptElement = document.createElement('small');
+    messageReceiptElement.classList.add('message-receipt', 'text-muted');
+
     if (message.sender.userId === sb.currentUser.userId) {
+		const isDelivered = currentChannel.getReadReceipt(message);
+		messageReceiptElement.textContent = isDelivered ? 'Read' : 'Sent';
+		messageBubbleElement.appendChild(messageReceiptElement);
         messageBubbleElement.classList.add('sent');
         // Move avatar to the right for sent messages
         messageBubbleElement.classList.add('align-self-end');
