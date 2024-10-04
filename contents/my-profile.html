@@ -165,6 +165,18 @@
             background-color: #c82333;
             border-color: #bd2130;
         }
+
+        #profile-container {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        /* 프로필 컨테이너를 보여줄 때 */
+        #profile-container.show {
+            display: block;
+            opacity: 1;
+        }
     
         @media (max-width: 576px) {
             .header {
@@ -207,7 +219,7 @@
                             <button id="complete-profile-btn" class="btn btn-warning">지금 프로필 완성하기</button>
                         </div>
 
-                        <div class="profile-card">
+                        <div id="profile-container" class="profile-card">
                             <div class="text-center mb-4">
                                 <img id="profile-image" src="/contents/default-profile.png" alt="프로필 이미지" class="profile-image mb-3">
                                 <h2 id="user-nickname" class="h4 mb-0">이름</h2>

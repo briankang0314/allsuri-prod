@@ -75,6 +75,11 @@ function UpdateProfileUI(profile) {
     // profile image
     document.getElementById('profile-image').src = profile.profile_image_url ?? '/contents/_icon.png';
 
+    const profileContainer = document.getElementById('profile-container');
+    if (profileContainer) {
+        profileContainer.classList.add('show');
+    }
+    
     // user info
     document.getElementById('user-nickname').textContent = profile.nickname ?? '정보 없음';
     document.getElementById('user-email').textContent = profile.email ?? '정보 없음';
