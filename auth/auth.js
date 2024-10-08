@@ -1,7 +1,62 @@
 import { FillTheBody } from '../main.js';
 import { GetDeviceToken } from '../api/firebaseService.js';
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { ShowSuccessMessage, ShowErrorMessage } from '../utils/helpers.js';
 
 
+export async function signUpWithEmail(email, password) {
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0TopF4AXzudCBoNWTbFwXAuaV76TPke8",
+        authDomain: "allsuri-prod.firebaseapp.com",
+        projectId: "allsuri-prod",
+        storageBucket: "allsuri-prod.appspot.com",
+        messagingSenderId: "64688660310",
+        appId: "1:64688660310:web:22c5a4cca7d6097a1740f7",
+        measurementId: "G-L1JSJVYKLY"
+    };
+      
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCredential.user);
+      ShowSuccessMessage('Account created successfully. Please check your email for verification.');
+      return userCredential.user;
+    } catch (error) {
+      ShowErrorMessage(error.message);
+      throw error;
+    }
+  }
+  
+  export async function loginWithEmail(email, password) {
+    const firebaseConfig = {
+        apiKey: "AIzaSyD0TopF4AXzudCBoNWTbFwXAuaV76TPke8",
+        authDomain: "allsuri-prod.firebaseapp.com",
+        projectId: "allsuri-prod",
+        storageBucket: "allsuri-prod.appspot.com",
+        messagingSenderId: "64688660310",
+        appId: "1:64688660310:web:22c5a4cca7d6097a1740f7",
+        measurementId: "G-L1JSJVYKLY"
+    };
+      
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        ShowErrorMessage('Please verify your email before logging in.');
+        return null;
+      }
+      ShowSuccessMessage('Logged in successfully');
+      return userCredential.user;
+    } catch (error) {
+      ShowErrorMessage(error.message);
+      throw error;
+    }
+  }
 
 export async function LoginByKakao() {
     const urlParams = new URLSearchParams(window.location.search);

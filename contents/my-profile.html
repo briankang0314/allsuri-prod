@@ -1,304 +1,298 @@
-<!-- ////my-profile.html//// -->
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>올수리 - 내 프로필</title>
+<!-- my-profile.html -->
+<style>
+    :root {
+        --primary-bg-color: #f8f9fa;
+        --secondary-bg-color: #ffffff;
+        --primary-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --secondary-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        --border-radius: 15px;
+        --btn-padding: 0.375rem 1rem;
+        --font-family: 'Noto Sans KR', sans-serif;
+    }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    body {
+        font-family: var(--font-family);
+        background-color: var(--primary-bg-color);
+        margin: 0;
+        padding: 0;
+    }
 
-    <style>
-        :root {
-            --primary-bg-color: #f8f9fa;
-            --secondary-bg-color: #ffffff;
-            --primary-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --border-radius: 15px;
-            --accent-color: #6c757d;
-        }
-    
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: var(--primary-bg-color);
-            color: #333;
-        }
-    
-        .container-fluid {
-            max-width: 1200px;
-        }
-    
+    .container-fluid {
+        max-width: 1200px;
+    }
+
+    /* Header styles consistent with other pages */
+    .header {
+        background-color: var(--secondary-bg-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--primary-shadow);
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        margin-right: 10px;
+    }
+
+    .logo:hover {
+        transform: scale(1.1);
+    }
+
+    .btn {
+        border-radius: 20px;
+        padding: var(--btn-padding);
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-back {
+        background-color: #f8f9fa;
+        color: #000000;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-back:hover {
+        background-color: #e9ecef;
+    }
+
+    .content {
+        background-color: var(--secondary-bg-color);
+        border-radius: var(--border-radius);
+        box-shadow: var(--primary-shadow);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .profile-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #6c757d;
+        transition: all 0.3s ease;
+    }
+
+    .profile-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(108, 117, 125, 0.5);
+    }
+
+    .section-title {
+        border-bottom: 2px solid #6c757d;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .stat-item {
+        background-color: var(--primary-bg-color);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        background-color: #e9ecef;
+        transform: translateY(-3px);
+    }
+
+    .stat-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+        color: #6c757d;
+    }
+
+    .progress {
+        height: 10px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+    }
+
+    .progress-bar {
+        background-color: #6c757d;
+    }
+
+    .btn-edit-profile {
+        background-color: #6c757d;
+        color: #ffffff;
+        border: none;
+    }
+
+    .btn-edit-profile:hover {
+        background-color: #5a6268;
+    }
+
+    .incomplete-profile-warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: var(--border-radius);
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .incomplete-profile-warning .btn {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #ffffff;
+    }
+
+    .incomplete-profile-warning .btn:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    @media (max-width: 768px) {
         .header {
-            background-color: var(--secondary-bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--primary-shadow);
-            margin-bottom: 20px;
-            padding: 15px 20px;
-        }
-    
-        .logo {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-            transition: transform 0.3s ease;
-            margin-right: 10px;
-        }
-    
-        .logo:hover {
-            transform: scale(1.1);
-        }
-    
-        .btn {
-            border-radius: 20px;
-            padding: 0.375rem 1rem;
-            transition: all 0.3s ease;
-        }
-    
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-    
-        #back-btn {
-            background-color: var(--primary-bg-color);
-            color: #000000;
-            border: 1px solid #ced4da;
-        }
-    
-        #back-btn:hover {
-            background-color: #e9ecef;
-        }
-    
-        .content {
-            padding: 3rem 0;
-        }
-    
-        .profile-card {
-            border: none;
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            background-color: var(--secondary-bg-color);
-            box-shadow: var(--primary-shadow);
-            transition: all 0.3s ease;
-        }
-    
-        .profile-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-        }
-    
-        .profile-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--accent-color);
-            transition: all 0.3s ease;
-        }
-    
-        .profile-image:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(108, 117, 125, 0.5);
-        }
-    
-        .btn-edit-profile {
-            background-color: var(--accent-color);
-            color: var(--secondary-bg-color);
-            border: none;
-        }
-    
-        .btn-edit-profile:hover {
-            background-color: #5a6268;
-        }
-    
-        .progress {
-            height: 10px;
-            border-radius: 5px;
-            background-color: #e9ecef;
-        }
-    
-        .progress-bar {
-            background-color: var(--accent-color);
-        }
-    
-        .section-title {
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-    
-        .stat-item {
-            background-color: var(--primary-bg-color);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-    
-        .stat-item:hover {
-            background-color: #e9ecef;
-            transform: translateY(-3px);
-        }
-    
-        .stat-icon {
-            font-size: 1.5rem;
-            margin-right: 0.5rem;
-            color: var(--accent-color);
-        }
-    
-        .incomplete-profile-warning {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
             padding: 15px;
-            margin-bottom: 20px;
-            display: none;
-        }
-    
-        .incomplete-profile-warning .btn {
-            margin-top: 10px;
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: var(--secondary-bg-color);
-        }
-    
-        .incomplete-profile-warning .btn:hover {
-            background-color: #c82333;
-            border-color: #bd2130;
         }
 
-        #profile-container {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
+        .header h1 {
+            font-size: 1.75rem;
         }
 
-        /* 프로필 컨테이너를 보여줄 때 */
-        #profile-container.show {
-            display: block;
-            opacity: 1;
+        .logo {
+            width: 35px;
+            height: 35px;
+            margin-right: 8px;
         }
-    
-        @media (max-width: 576px) {
-            .header {
-                padding: 10px 15px;
-            }
-    
-            .header h1 {
-                font-size: 1.5rem;
-            }
-    
-            .btn {
-                font-size: 0.9rem;
-                padding: 0.3rem 0.8rem;
-            }
+
+        .btn {
+            font-size: 0.9rem;
+            padding: 0.3rem 0.8rem;
         }
-    </style>
-</head>
-<body>
-    <div class="container-fluid">
-        <header class="header d-flex justify-content-between align-items-center mb-4 py-3">
-            <div class="d-flex align-items-center">
-                <a href="#" id="logo-link">
-                    <img src="/favicon.ico" alt="올수리 로고" class="logo me-2">
-                </a>
-                <h1 class="h3 fw-bold m-0">내 프로필</h1>
-            </div>
-            <button id="back-btn" class="btn btn-outline-dark">
-                <i class="fas fa-arrow-left me-1"></i>
-                <span class="d-none d-sm-inline">홈으로 가기</span>
+
+        .content {
+            padding: 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .header {
+            padding: 10px 15px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+        }
+
+        .logo {
+            width: 30px;
+            height: 30px;
+            margin-right: 5px;
+        }
+
+        .btn {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.7rem;
+        }
+
+        .content {
+            padding: 10px;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <header class="header">
+        <div class="d-flex align-items-center">
+            <a href="#" id="logo-link">
+                <img src="/favicon.ico" alt="올수리 로고" class="logo">
+            </a>
+            <h1 class="h3 fw-bold m-0">내 프로필</h1>
+        </div>
+        <button id="back-btn" class="btn btn-back">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">홈으로</span>
+        </button>
+    </header>
+
+    <div class="content">
+        <div id="incomplete-profile-warning" class="incomplete-profile-warning d-none">
+            <h4><i class="bi bi-exclamation-triangle-fill"></i> 프로필 완성 필요</h4>
+            <p>서비스를 이용하기 위해 프로필을 완성해 주세요. 전화번호, 지역, 선호 카테고리 정보가 필요합니다.</p>
+            <button id="complete-profile-btn" class="btn">
+                <i class="bi bi-pencil-fill"></i> 지금 프로필 완성하기
             </button>
-        </header>
+        </div>
 
-        <main class="content">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div id="incomplete-profile-warning" class="incomplete-profile-warning">
-                            <h4><i class="fas fa-exclamation-triangle"></i> 프로필 완성 필요</h4>
-                            <p>서비스를 이용하기 위해 프로필을 완성해 주세요. 전화번호, 지역, 선호 카테고리 정보가 필요합니다.</p>
-                            <button id="complete-profile-btn" class="btn btn-warning">지금 프로필 완성하기</button>
-                        </div>
+        <div id="profile-container" class="text-center">
+            <img id="profile-image" src="/contents/default-profile.png" alt="프로필 이미지" class="profile-image mb-3">
+            <h2 id="user-nickname" class="h4 mb-0">이름</h2>
+            <p id="user-email" class="text-muted">user@example.com</p>
+            <p><span id="account-type" class="badge bg-primary">일반 사용자</span></p>
 
-                        <div id="profile-container" class="profile-card">
-                            <div class="text-center mb-4">
-                                <img id="profile-image" src="/contents/default-profile.png" alt="프로필 이미지" class="profile-image mb-3">
-                                <h2 id="user-nickname" class="h4 mb-0">이름</h2>
-                                <p id="user-email" class="text-muted">user@example.com</p>
-                                <p><span id="account-type" class="badge bg-primary">일반 사용자</span></p>
-                            </div>
+            <hr>
 
-                            <div class="mb-4">
-                                <h3 class="h5 section-title">개인 정보</h3>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><i class="fas fa-calendar-alt stat-icon"></i> <strong>가입일:</strong> <span id="created-at"></span></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p><i class="fas fa-phone stat-icon"></i> <strong>연락처:</strong> <span id="user-phone"></span></p>
-                                        <p><i class="fas fa-map-marker-alt stat-icon"></i> <strong>지역:</strong> <span id="user-location"></span></p>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="row text-start">
+                <div class="col-md-6">
+                    <p><i class="bi bi-calendar-event stat-icon"></i> <strong>가입일:</strong> <span id="created-at">알 수 없음</span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><i class="bi bi-telephone stat-icon"></i> <strong>연락처:</strong> <span id="user-phone">정보 없음</span></p>
+                    <p><i class="bi bi-geo-alt stat-icon"></i> <strong>지역:</strong> <span id="user-location">정보 없음</span></p>
+                </div>
+            </div>
 
-                            <div id="profile-completion-section" class="mb-4">
-                                <h3 class="h5 section-title">프로필 완성도</h3>
-                                <div class="progress">
-                                    <div id="profile-completion" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                                </div>
-                            </div>
+            <div id="profile-completion-section" class="mb-4">
+                <h3 class="h5 section-title">프로필 완성도</h3>
+                <div class="progress">
+                    <div id="profile-completion" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                </div>
+            </div>
 
-                            <div class="mb-4">
-                                <h3 class="h5 section-title">평점 및 오더 정보</h3>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="stat-item">
-                                            <p class="mb-0"><i class="fas fa-star stat-icon"></i> <strong>평균 평점:</strong> <span id="user-rating"></span>/5.0</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="stat-item">
-                                            <p class="mb-0"><i class="fas fa-check-circle stat-icon"></i> <strong>완료된 오더:</strong> <span id="completed-orders"></span></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <h3 class="h5 section-title">계정 통계</h3>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="stat-item">
-                                            <p class="mb-0"><i class="fas fa-wrench stat-icon"></i> <strong>총 오더 수:</strong> <span id="total-orders"></span></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="stat-item">
-                                            <p class="mb-0"><i class="fas fa-check-double stat-icon"></i> <strong>완료한 오더:</strong> <span id="completed-orders-count"></span></p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="stat-item">
-                                            <p class="mb-0"><i class="fas fa-ban stat-icon"></i> <strong>취소율:</strong> <span id="cancellation-rate"></span>%</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <h3 class="h5 section-title">선호 카테고리</h3>
-                                <div id="preferred-categories"></div>
-                            </div>
-
-                            <div class="text-center">
-                                <button id="edit-profile-btn" class="btn btn-edit-profile"><i class="fas fa-user-edit me-1"></i>프로필 수정</button>
-                            </div>
-                        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="stat-item">
+                        <p class="mb-0"><i class="bi bi-star-fill stat-icon"></i> <strong>평균 평점:</strong> <span id="user-rating">아직 평가 없음</span></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="stat-item">
+                        <p class="mb-0"><i class="bi bi-patch-check-fill stat-icon"></i> <strong>완료된 오더:</strong> <span id="completed-orders">0</span></p>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    
-</body>
-</html>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <p class="mb-0"><i class="bi bi-hammer stat-icon"></i> <strong>총 오더 수:</strong> <span id="total-orders">0</span></p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <p class="mb-0"><i class="bi bi-check2-all stat-icon"></i> <strong>완료한 오더:</strong> <span id="completed-orders-count">0</span></p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <p class="mb-0"><i class="bi bi-x-circle stat-icon"></i> <strong>취소율:</strong> <span id="cancellation-rate">0%</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="h5 section-title">선호 카테고리</h3>
+                <div id="preferred-categories">
+                    <!-- Preferred categories badges will be inserted here -->
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="edit-profile-btn" class="btn btn-edit-profile">
+                    <i class="bi bi-pencil-fill"></i> 프로필 수정
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

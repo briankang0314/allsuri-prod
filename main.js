@@ -10,6 +10,7 @@ import { SetupOrderApplicationsPage } from './pages/orderApplicationsPage.js';
 import { SetupPostOrderPage } from './pages/postOrderPage.js';
 import { SetupApplyForOrderPage } from './pages/applyForOrderPage.js';
 import { SetupChatPage } from './pages/chatPage.js';
+import { SetupSignupPage } from './pages/signupPage.js';
 import { ShowErrorMessage } from './utils/helpers.js';
 import { ShowLoadingSpinner, HideLoadingSpinner } from './utils/loadingSpinner.js';
 
@@ -73,6 +74,9 @@ export async function FillTheBody(contentName, params = {}) {
                 break;
             case 'chat':
                 await SetupChatPage();
+                break;
+            case 'sign-up':
+                await SetupSignupPage();
                 break;
             default:
                 console.error(`Unknown content name: ${contentName}`);
