@@ -2,7 +2,6 @@ import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { InitializeApplicationForm } from './applyForOrderPage.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
-import { ShowLoadingSpinner, HideLoadingSpinner } from '../utils/loadingSpinner.js';
 import { cities, regions } from '../utils/constants.js';
 import { Logout } from '../auth/auth.js';
 

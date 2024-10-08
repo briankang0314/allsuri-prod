@@ -26,6 +26,9 @@ export async function SetupChatPage() {
 
         // Load the list of channels and set up event listeners
         await LoadChannelList();
+
+        document.getElementById('messageInputContainer').classList.add('hidden');
+
         setupEventListeners();
     } else {
         // Redirect to login page if user is not authenticated
@@ -174,6 +177,8 @@ async function OnChannelSelected(channelUrl) {
     }
 
     await LoadMessages(currentChannel);
+
+    document.getElementById('messageInputContainer').classList.remove('hidden');
 }
 
 async function LoadMessages(channel) {
@@ -258,9 +263,6 @@ function DisplayMessage(message, shouldScroll) {
     contentElement.classList.add('message-content');
     contentElement.classList.add(isSentByCurrentUser ? 'sent' : 'received');
     contentElement.textContent = message.message || '';
-
-    // Assign 'sent' or 'received' class to the message content
-    contentElement.classList.add(isSentByCurrentUser ? 'sent' : 'received');
 
     // Create the timestamp element
     const timestampElement = document.createElement('div');
