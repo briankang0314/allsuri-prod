@@ -65,17 +65,27 @@ function SetupHomePageEventListeners() {
         });
     }
 
-    // Dropdown menu items
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
-    dropdownItems.forEach(item => {
-        item.addEventListener('click', HandleDropdownItemClick);
+    // Menu button
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+            offcanvasMenu.show();
+        });
+    }
+
+    // Offcanvas menu items
+    const menuItems = document.querySelectorAll('#offcanvasMenu .nav-link');
+    menuItems.forEach(item => {
+        item.addEventListener('click', HandleMenuItemClick);
     });
 
-    // Refresh button
-    const refreshBtn = document.getElementById('refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', RefreshOrderPosts);
-    }
+    // // Refresh button
+    // const refreshBtn = document.getElementById('refresh-btn');
+    // if (refreshBtn) {
+    //     refreshBtn.addEventListener('click', RefreshOrderPosts);
+    // }
 
     // Pagination
     const paginationContainer = document.getElementById('pagination-container');
@@ -88,6 +98,8 @@ function SetupHomePageEventListeners() {
             }
         });
     }
+
+    SetupPullToRefresh();
 }
 
 async function FetchAndDisplayOrderPosts(page = 1) {
@@ -260,28 +272,55 @@ function SetupFilterAndSort() {
     });
 }
 
-async function RefreshOrderPosts() {
-    
+function SetupPullToRefresh() {
+    let isRefreshing = false;
+    let startY = 0;
+    let currentY = 0;
+    let refreshThreshold = 60; // Threshold in pixels to trigger refresh
+
+    const contentContainer = document.querySelector('body');
+
+    contentContainer.addEventListener('touchstart', (e) => {
+        if (window.scrollY === 0) {
+            startY = e.touches[0].pageY;
+        }
+    });
+
+    contentContainer.addEventListener('touchmove', (e) => {
+        if (window.scrollY === 0) {
+            currentY = e.touches[0].pageY;
+            if (currentY - startY > refreshThreshold && !isRefreshing) {
+                isRefreshing = true;
+                TriggerRefresh();
+            }
+        }
+    });
+
+    contentContainer.addEventListener('touchend', () => {
+        startY = 0;
+        currentY = 0;
+        isRefreshing = false;
+    });
+}
+
+async function TriggerRefresh() {
     try {
-        await FetchAndDisplayOrderPosts(1); // Fetch the first page of posts
+        await FetchAndDisplayOrderPosts(1);
         ShowSuccessMessage('오더 목록이 새로고침되었습니다.', 3000);
     } catch (error) {
         console.error('Error refreshing order posts:', error);
         ShowErrorMessage('오더 목록 새로고침 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-        
     }
 }
 
-function HandleDropdownItemClick(e) {
+function HandleMenuItemClick(e) {
     e.preventDefault();
     const href = e.target.getAttribute('href');
 
-    // Close the dropdown using Bootstrap's API
-    const dropdownEl = document.querySelector('#settings-btn');
-    const dropdown = bootstrap.Dropdown.getInstance(dropdownEl);
-    if (dropdown) {
-        dropdown.hide();
+    // Close the offcanvas menu
+    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+    if (offcanvasMenu) {
+        offcanvasMenu.hide();
     }
 
     // Handle the click action
@@ -294,14 +333,14 @@ function HandleDropdownItemClick(e) {
                 FillTheBody('my-orders');
                 break;
             case '#my-applications':
-                FillTheBody('my-applications');  // New case for My Applications
+                FillTheBody('my-applications');
                 break;
-			case '#logout':
+            case '#logout':
                 Logout();
                 break;
         }
     } catch (error) {
-        console.error('Error handling dropdown item click:', error);
+        console.error('Error handling menu item click:', error);
         ShowErrorMessage('오류가 발생했습니다. 다시 시도해주세요.');
     }
 }

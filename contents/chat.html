@@ -13,84 +13,84 @@
     body {
         font-family: var(--font-family);
         background-color: var(--primary-bg-color);
-        margin: 0;
-        padding: 0;
+        margin-bottom: calc(80px + env(safe-area-inset-bottom));
     }
 
     .container-fluid {
         max-width: 1200px;
     }
 
-    /* Header styles consistent with home.html */
-    .header {
-        background-color: var(--secondary-bg-color);
-        border-radius: var(--border-radius);
-        box-shadow: var(--primary-shadow);
-        padding: 15px 20px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-        margin-right: 10px;
-    }
-
-    .logo:hover {
-        transform: scale(1.1);
-    }
-
+    /* Touch-friendly button sizes */
     .btn {
-        border-radius: 20px;
-        padding: var(--btn-padding);
-        transition: all 0.3s ease;
+        min-width: 44px;
+        min-height: 44px;
     }
 
-    .btn:hover {
-        transform: translateY(-2px);
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--secondary-bg-color);
+        box-shadow: var(--primary-shadow);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        padding-top: 10px;
+        padding-bottom: env(safe-area-inset-bottom);
     }
 
-    .btn-channel-list {
-        background-color: #007bff;
-        color: #ffffff;
+    .bottom-nav .nav-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .bottom-nav .nav-link,
+    .bottom-nav .navbar-toggler {
+        color: #000;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        width: 100%;
+    }
+
+    .bottom-nav .nav-link .bi,
+    .bottom-nav .navbar-toggler .bi {
+        font-size: 24px;
+        margin-bottom: 4px;
+    }
+
+    .navbar-toggler {
         border: none;
+        background: transparent;
     }
 
-    .btn-channel-list:hover {
-        background-color: #0056b3;
+    .navbar-toggler:focus {
+        outline: none;
+        box-shadow: none;
     }
 
     /* Chat area styles */
-    .main-content {
+    #chat-area {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 120px); /* Adjusted based on header height */
+        height: calc(100vh - 80px);
         overflow: hidden;
     }
 
-    .chat-area {
-        flex: 1;
+    #messageList {
         display: flex;
         flex-direction: column;
-        background-color: var(--secondary-bg-color);
-        border-radius: var(--border-radius);
-        box-shadow: var(--primary-shadow);
-        padding: 15px;
-    }
-
-    .message-list {
         flex: 1;
         overflow-y: auto;
         padding: 15px;
-        background-color: var(--primary-bg-color);
-        border-radius: var(--border-radius);
-        display: flex;
-        flex-direction: column;
+        background-color: var(--secondary-bg-color);
     }
 
     .message-item {
@@ -111,9 +111,9 @@
     .message-content {
         padding: 10px 15px;
         border-radius: 18px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--secondary-shadow);
         word-wrap: break-word;
-        animation: fadeIn 0.3s ease-out;
+        /* Remove any fixed width */
     }
 
     .message-content.sent {
@@ -137,7 +137,7 @@
     .message-item.sent .message-timestamp {
         align-self: flex-end;
     }
-    
+
     .message-item.received .message-timestamp {
         align-self: flex-start;
     }
@@ -147,16 +147,12 @@
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .message-input {
+    #messageInputContainer {
         display: flex;
         align-items: center;
         padding: 10px;
         background-color: var(--secondary-bg-color);
-        border-top: 1px solid #ced4da;
-    }
-    
-    .message-input.hidden {
-        display: none;
+        box-shadow: var(--primary-shadow);
     }
 
     #messageInput {
@@ -166,227 +162,161 @@
         border: 1px solid #ced4da;
         margin-right: 10px;
         font-size: 1rem;
-        width: calc(100% - 70px); /* Adjust this value to change input width */
+        height: 44px;
     }
 
     #sendButton {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0 20px; /* Increased padding for wider button */
+        width: 44px;
+        height: 44px; /* Match the height of the input */
         border-radius: var(--border-radius);
         background-color: #007bff;
         color: #ffffff;
         border: none;
-        height: 100%;
         transition: background-color 0.3s ease;
-        width: 60px; /* Set a fixed width for the button */
+        padding: 0; /* Remove padding */
     }
 
     #sendButton:hover {
         background-color: #0056b3;
     }
 
-    #sendButton i {
-        font-size: 1.5rem;
+    #sendButton svg {
+        width: 24px;
+        height: 24px;
     }
 
-    /* Channel List Overlay */
-    #channelListOverlay {
-        position: fixed;
-        top: 0;
-        left: -250px;
-        width: 250px;
-        height: 100%;
-        background-color: var(--secondary-bg-color);
-        box-shadow: var(--primary-shadow);
-        overflow-y: auto;
-        transition: left 0.3s ease;
-        z-index: 1000;
+    /* Message template */
+    #message-template {
+        display: none;
     }
 
-    #channelListOverlay.active {
-        left: 0;
+    /* Channel List Offcanvas */
+    #channelListOffcanvas .offcanvas-body {
+        padding: 0;
     }
 
-    .channel-list-header {
+    .channel-list-item {
         padding: 15px;
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .channel-item {
-        padding: 10px 15px;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #e9ecef;
         cursor: pointer;
     }
 
-    .channel-item:hover {
-        background-color: #f0f0f0;
+    .channel-list-item:hover {
+        background-color: #f8f9fa;
     }
 
-    /* Overlay Background */
-    #overlayBackground {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 900;
-    }
-
-    #overlayBackground.active {
-        display: block;
-    }
-
-    /* Responsive styles */
-    @media (max-width: 768px) {
-        .header {
-            padding: 15px;
-        }
-
-        .header h1 {
-            font-size: 1.75rem;
-        }
-
-        .logo {
-            width: 35px;
-            height: 35px;
-            margin-right: 8px;
-        }
-
-        .btn {
-            font-size: 0.9rem;
-            padding: 0.3rem 0.8rem;
-        }
-
-        /* Adjust chat area height */
-        .main-content {
-            height: calc(100vh - 100px);
-        }
-
-        /* Adjust channel list overlay */
-        #channelListOverlay {
-            width: 200px;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .header {
-            padding: 10px 15px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-        }
-
-        .logo {
-            width: 30px;
-            height: 30px;
-            margin-right: 5px;
-        }
-
-        .btn {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.7rem;
-        }
-
-        .message-list {
-            padding: 10px;
-        }
-
-        .message-content {
-            font-size: 0.9rem;
-        }
-
-        .message-input {
-            padding: 10px;
-        }
-
-        #messageInput {
-            font-size: 0.9rem;
-            padding: 10px;
-        }
-
-        #sendButton {
-            font-size: 0.9rem;
-            padding: 10px 15px;
-        }
-
-        .main-content {
-            height: calc(100vh - 90px);
-        }
-    }
-
-    @media (max-width: 320px) {
-        .header h1 {
-            font-size: 1.25rem;
-        }
-
-        .logo {
-            width: 25px;
-            height: 25px;
-        }
-
-        .btn {
-            font-size: 0.8rem;
-            padding: 0.2rem 0.6rem;
-        }
-
-        .message-content {
-            font-size: 0.8rem;
-        }
-
-        .message-timestamp {
-            font-size: 0.7rem;
-        }
-
-        .main-content {
+    /* Responsive adjustments */
+    @media (min-width: 768px) {
+        #chat-area {
             height: calc(100vh - 80px);
         }
     }
 </style>
 
 <div class="container-fluid">
-    <header class="header">
-        <div class="d-flex align-items-center">
-            <a href="#" id="logo-link">
-                <img src="/favicon.ico" alt="올수리 로고" class="logo">
-            </a>
-            <h1 class="h3 fw-bold m-0">채팅</h1>
-        </div>
-        <div class="d-flex align-items-center">
-            <button id="channelListBtn" class="btn btn-channel-list me-2">
-                <i class="bi bi-list"></i> <span class="d-none d-sm-inline">채널 목록</span>
-            </button>
-        </div>
-    </header>
-    <div class="main-content">
-        <!-- Channel List Overlay -->
-        <div id="channelListOverlay">
-            <div class="channel-list-header">
-                <h5>채널 목록</h5>
-            </div>
-            <div id="channelListContent">
-                <!-- Channels will be populated here -->
-            </div>
-        </div>
-        <!-- Overlay Background -->
-        <div id="overlayBackground"></div>
+    <main role="main">
         <!-- Chat Area -->
-        <div class="chat-area">
-            <div class="message-list" id="messageList">
-                <!-- Messages will be displayed here -->
+        <section id="chat-area">
+            <!-- Message List -->
+            <div id="messageList">
+                <!-- Messages will be dynamically inserted here -->
             </div>
-            <div class="message-input hidden" id="messageInputContainer">
+
+            <!-- Message Input -->
+            <div id="messageInputContainer">
                 <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" />
                 <button id="sendButton">
+                    <!-- Inline SVG Icon for Send Button -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
                         <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
                     </svg>
                 </button>
             </div>
+        </section>
+    </main>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="navbar navbar-expand navbar-light bottom-nav">
+    <div class="container-fluid">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item">
+                <a href="#" id="home-btn" class="nav-link">
+                    <i class="bi bi-house-fill"></i>
+                    <span>홈</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="post-order-btn" class="nav-link">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>새 오더</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="channel-list-btn" class="nav-link active">
+                    <i class="bi bi-chat-square-text"></i>
+                    <span>채널 목록</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="menu-btn" class="nav-link">
+                    <i class="bi bi-list"></i>
+                    <span>메뉴</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Offcanvas Menu -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">메뉴</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="#profile">내 프로필</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-orders">내 오더</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-applications">내 지원서</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Channel List Offcanvas -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="channelListOffcanvas">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">채널 목록</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="channelList">
+            <!-- Channel items will be dynamically inserted here -->
         </div>
     </div>
 </div>
+
+<!-- Message Template -->
+<template id="message-template">
+    <div class="message-item">
+        <div class="message-content"></div>
+        <span class="message-timestamp"></span>
+    </div>
+</template>
+
+<!-- Channel List Item Template -->
+<template id="channel-list-item-template">
+    <div class="channel-list-item">
+        <strong class="channel-name"></strong>
+        <p class="channel-last-message mb-0 text-muted"></p>
+    </div>
+</template>

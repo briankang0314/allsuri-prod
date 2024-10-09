@@ -1,3 +1,4 @@
+// chatPage.js
 import SendbirdChat from '@sendbird/chat';
 import { GroupChannelModule, GroupChannelHandler } from '@sendbird/chat/groupChannel';
 import { FillTheBody } from '../main.js';
@@ -10,28 +11,22 @@ const sb = SendbirdChat.init({
 let currentChannel = null;
 
 export async function SetupChatPage() {
-    // Assume user data is stored in localStorage
     const user = JSON.parse(localStorage.getItem('user'));
 
     if (user) {
-        // Connect the user
         await sb.connect(user.user_id);
         await sb.updateCurrentUserInfo({
             nickname: user.nickname,
             profileUrl: user.thumbnail_image_url,
         });
 
-        // Add channel handler to receive new messages
         AddChannelHandler();
 
-        // Load the list of channels and set up event listeners
-        await LoadChannelList();
-
-        document.getElementById('messageInputContainer').classList.add('hidden');
-
         setupEventListeners();
+
+        // Load and display channel list
+        await LoadChannelList();
     } else {
-        // Redirect to login page if user is not authenticated
         await FillTheBody('login');
     }
 }
@@ -61,260 +56,169 @@ function setupEventListeners() {
         }
     });
 
-    // Select a channel from the list
-    const channelListElement = document.getElementById('channelListContent');
-    channelListElement.addEventListener('click', async (event) => {
-        const channelItem = event.target.closest('.channel-item');
-        if (channelItem) {
-            const channelUrl = channelItem.dataset.channelUrl;
-            await OnChannelSelected(channelUrl);
-            // Close the channel list after selection
-            closeChannelList();
-        }
+    // Navigation button event listeners
+    const homeBtn = document.getElementById('home-btn');
+    homeBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await FillTheBody('home');
     });
 
-    // Logo link to home page
-    const logoLink = document.getElementById('logo-link');
-    if (logoLink) {
-        logoLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await FillTheBody('home');
-        });
-    } else {
-        console.warn('Logo link not found.');
-    }
-
-    // Toggle Channel List Visibility
-    const channelListBtn = document.getElementById('channelListBtn');
-    const channelListOverlay = document.getElementById('channelListOverlay');
-    const overlayBackground = document.getElementById('overlayBackground');
-
-
-	async function toggleChannelList() {
-        const channels = await LoadChannelList();
-        if (channels.length > 0) {
-            channelListOverlay.classList.add('active');
-            overlayBackground.style.display = 'block';
-            channelListOverlay.style.left = '0';
-        } else {
-            alert('No channels available.');
-        }
-    }
-
-    if (channelListBtn) {
-        channelListBtn.addEventListener('click', toggleChannelList);
-    } else {
-        console.warn('Channel list button not found.');
-    }
-
-    if (overlayBackground) {
-        overlayBackground.addEventListener('click', closeChannelList);
-    } else {
-        console.warn('Overlay background not found.');
-    }
-
-	// Add resize event listener
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768 && channelListOverlay.classList.contains('active')) {
-            channelListOverlay.style.left = '0';
-        } else if (!channelListOverlay.classList.contains('active')) {
-            closeChannelList();
-        }
+    const postOrderBtn = document.getElementById('post-order-btn');
+    postOrderBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await FillTheBody('postOrder');
     });
-}
 
-function closeChannelList() {
-	const channelListOverlay = document.getElementById('channelListOverlay');
-	const overlayBackground = document.getElementById('overlayBackground');
-	
-	channelListOverlay.classList.remove('active');
-	overlayBackground.style.display = 'none';
-	if (window.innerWidth <= 768) {
-		channelListOverlay.style.left = '-100%';
-	} else {
-		channelListOverlay.style.left = '-250px';
-	}
+    const channelListBtn = document.getElementById('channel-list-btn');
+    channelListBtn.addEventListener('click', () => {
+        const offcanvasChannelList = new bootstrap.Offcanvas(document.getElementById('channelListOffcanvas'));
+        offcanvasChannelList.toggle();
+    });
+
+    const menuBtn = document.getElementById('menu-btn');
+    menuBtn.addEventListener('click', () => {
+        const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+        offcanvasMenu.toggle();
+    });
 }
 
 async function LoadChannelList() {
-	console.log('Loading channel list');
-    // Create a query to get the list of channels
+    const channelListElement = document.getElementById('channelList');
+    channelListElement.innerHTML = '';
+
     const channelListQuery = sb.groupChannel.createMyGroupChannelListQuery();
-    channelListQuery.limit = 20;
+    channelListQuery.limit = 50;
     channelListQuery.includeEmpty = true;
 
     try {
         const channels = await channelListQuery.next();
-        console.log('Fetched channels:', channels);
-
-        const channelListElement = document.getElementById('channelListContent');
-        channelListElement.innerHTML = '';
-
         channels.forEach(channel => {
-            console.log('Adding channel to list:', channel.name || 'Unnamed Channel');
-            const channelItemElement = document.createElement('div');
-            channelItemElement.classList.add('channel-item');
-            channelItemElement.dataset.channelUrl = channel.url;
-            channelItemElement.innerHTML = `<i class="bi bi-chat-dots me-2"></i> ${channel.name || 'Unnamed Channel'}`;
-            channelListElement.appendChild(channelItemElement);
+            DisplayChannelItem(channel);
         });
 
-        console.log('Channel list populated with', channels.length, 'channels');
-        return channels; // Return the channels array
+        // Do not automatically select a channel; let the user choose
     } catch (error) {
-        console.error('Error fetching channels:', error);
-        return []; // Return an empty array if there's an error
+        console.error('Error loading channel list:', error);
     }
 }
 
-async function OnChannelSelected(channelUrl) {
-    console.log('Channel selected:', channelUrl);
-    try {
-        currentChannel = await sb.groupChannel.getChannel(channelUrl);
-        console.log('Fetched channel:', currentChannel);
-    } catch (error) {
-        console.error('Error fetching channel:', error);
-    }
+function DisplayChannelItem(channel) {
+    const channelListElement = document.getElementById('channelList');
 
-    await LoadMessages(currentChannel);
+    const channelItemTemplate = document.getElementById('channel-list-item-template');
+    const channelItem = channelItemTemplate.content.cloneNode(true).querySelector('.channel-list-item');
 
-    document.getElementById('messageInputContainer').classList.remove('hidden');
+    channelItem.dataset.channelUrl = channel.url;
+    channelItem.querySelector('.channel-name').textContent = channel.name || 'Unnamed Channel';
+    channelItem.querySelector('.channel-last-message').textContent = channel.lastMessage ? channel.lastMessage.message : 'No messages yet';
+
+    channelItem.addEventListener('click', async () => {
+        currentChannel = channel;
+        // Close the channel list offcanvas
+        const offcanvasChannelList = bootstrap.Offcanvas.getInstance(document.getElementById('channelListOffcanvas'));
+        offcanvasChannelList.hide();
+
+        await LoadMessages(currentChannel);
+    });
+
+    channelListElement.appendChild(channelItem);
 }
 
 async function LoadMessages(channel) {
-    console.log('Loading messages for channel:', channel.url);
     const messageListElement = document.getElementById('messageList');
     messageListElement.innerHTML = '';
 
-    let allMessages = [];
-    let hasMore = true;
-    let timestamp = 0; // Start from the earliest timestamp
+    const messageListParams = {
+        prevResultSize: 50,
+        isInclusive: true,
+        reverse: false,
+        includeMetaArray: true,
+        includeReactions: true,
+        includeSender: true,
+    };
 
-    while (hasMore) {
-        const messageListParams = {
-            prevResultSize: 0,
-            nextResultSize: 100,
-            isInclusive: false,
-            reverse: false, // Messages ordered from oldest to newest
-			includeMetaArray: true, // Include if you want meta arrays
-            includeReactions: true, // Include if reactions are used
-            includeSender: true,    // Ensure sender information is included
-        };
-
-        try {
-            const messages = await channel.getMessagesByTimestamp(timestamp, messageListParams);
-
-            if (messages.length > 0) {
-                // Append messages to the end of allMessages
-                allMessages = allMessages.concat(messages);
-                // Update timestamp to the last message's createdAt
-                timestamp = messages[messages.length - 1].createdAt + 1;
-            } else {
-                hasMore = false;
-            }
-        } catch (error) {
-            console.error('Error fetching messages:', error);
-            hasMore = false;
-        }
+    try {
+        const messages = await channel.getMessagesByTimestamp(Date.now(), messageListParams);
+        messages.forEach(message => {
+            DisplayMessage(message, false);
+        });
+        // Scroll to the bottom after loading messages
+        messageListElement.scrollTop = messageListElement.scrollHeight;
+    } catch (error) {
+        console.error('Error fetching messages:', error);
     }
-
-    // Now allMessages is ordered from oldest to newest
-    allMessages.forEach(message => {
-        DisplayMessage(message, false);
-    });
-
-    // Scroll to the bottom after loading messages
-    messageListElement.scrollTop = messageListElement.scrollHeight;
 }
 
 function DisplayMessage(message, shouldScroll) {
-    console.log('Displaying message:', message);
     const messageListElement = document.getElementById('messageList');
 
-    // Create a unique ID for the message (optional but recommended)
     const messageId = `message-${message.messageId || Date.now()}`;
 
-    // Check if the message already exists in the DOM
     if (document.getElementById(messageId)) {
-        return; // Message already displayed
+        return;
     }
 
-    const messageItem = document.createElement('div');
-    messageItem.classList.add('message-item');
+    const messageItemTemplate = document.getElementById('message-template');
+    const messageItem = messageItemTemplate.content.cloneNode(true).querySelector('.message-item');
     messageItem.id = messageId;
 
     // Determine if the message was sent by the current user
     const isSentByCurrentUser = message.sender && message.sender.userId === sb.currentUser.userId;
 
-	console.log('Current User ID:', sb.currentUser.userId);
-	console.log('Message Sender:', message.sender);
+    if (isSentByCurrentUser) {
+        messageItem.classList.add('sent');
+    } else {
+        messageItem.classList.add('received');
+    }
 
-    // Assign 'sent' or 'received' class based on the sender
-    if (!message.sender) {
-		// Handle system or admin messages
-		messageItem.classList.add('system-message');
-	} else if (isSentByCurrentUser) {
-		messageItem.classList.add('sent');
-	} else {
-		messageItem.classList.add('received');
-	}
-
-    const contentElement = document.createElement('div');
-    contentElement.classList.add('message-content');
+    const contentElement = messageItem.querySelector('.message-content');
     contentElement.classList.add(isSentByCurrentUser ? 'sent' : 'received');
-    contentElement.textContent = message.message || '';
 
-    // Create the timestamp element
-    const timestampElement = document.createElement('div');
-    timestampElement.classList.add('message-timestamp');
+    // Correctly access the message text
+    contentElement.textContent = message.message || message.plainText || message.messageText || '';
 
-    // Format the timestamp to a readable format
+    const timestampElement = messageItem.querySelector('.message-timestamp');
+
     const messageDate = new Date(message.createdAt);
     const options = { hour: '2-digit', minute: '2-digit' };
     timestampElement.textContent = messageDate.toLocaleTimeString([], options);
 
-    // Append content and timestamp to the message item
-    messageItem.appendChild(contentElement);
-    messageItem.appendChild(timestampElement);
-
-    // Append the message item to the message list
     messageListElement.appendChild(messageItem);
 
-    // Scroll to the bottom if necessary
     if (shouldScroll) {
         messageListElement.scrollTop = messageListElement.scrollHeight;
     }
 }
 
 async function SendMessage(channel, messageText) {
-    console.log('Sending message:', messageText);
-    const params = { message: messageText };
-    const message = await channel.sendUserMessage(params);
-
-    // Manually set the sender and createdAt if they are missing
-    if (!message.sender) {
+    const params = {
+        message: messageText,
+        // Add a unique request ID to identify the message
+        requestId: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    };
+    try {
+        const message = await channel.sendUserMessage(params);
+        // Manually assign sender information
         message.sender = sb.currentUser;
+        DisplayMessage(message, true);
+    } catch (error) {
+        console.error('Error sending message:', error);
     }
-    if (!message.createdAt) {
-        message.createdAt = Date.now();
-    }
-
-    message.message = messageText;
-
-    console.log('Message sent:', message);
-    DisplayMessage(message, true);
 }
 
 function AddChannelHandler() {
-    console.log('Adding channel handler');
     const channelHandler = new GroupChannelHandler();
 
     channelHandler.onMessageReceived = (channel, message) => {
-        console.log('Message received:', message);
         if (currentChannel && channel.url === currentChannel.url) {
             DisplayMessage(message, true);
         }
     };
 
-    sb.groupChannel.addGroupChannelHandler('UNIQUE_HANDLER_ID', channelHandler);
+    channelHandler.onChannelChanged = async (channel) => {
+        // Update the channel list when a channel is changed
+        await LoadChannelList();
+    };
+
+    sb.groupChannel.addGroupChannelHandler('CHAT_HANDLER', channelHandler);
 }
