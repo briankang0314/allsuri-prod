@@ -22,29 +22,56 @@ export async function SetupPostOrderPage() {
     // Set up event listeners
     postOrderForm.addEventListener('submit', SubmitOrder);
 
-    const cancelButton = document.getElementById('cancel-post-order');
-    if (cancelButton) {
-        cancelButton.addEventListener('click', async () => await FillTheBody('home'));
+    // Home button
+    const homeBtn = document.getElementById('home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await FillTheBody('home');
+        });
     }
 
-    const backButton = document.getElementById('back-btn');
-    if (backButton) {
-        backButton.addEventListener('click', async () => await FillTheBody('home'));
+    // Chat button
+    const chatBtn = document.getElementById('chat-btn');    
+    if (chatBtn) {
+        chatBtn.addEventListener('click', async () => await FillTheBody('chat'));
     }
+
+    // Post Order button
+    const postOrderBtn = document.getElementById('post-order-btn');
+    if (postOrderBtn) {
+        postOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
+    }
+
+    // Menu buttons
+    const menuBtn = document.getElementById('menu-btn');
+    const menuBtnBottom = document.getElementById('menu-btn-bottom');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+            offcanvasMenu.show();
+        });
+    }
+    if (menuBtnBottom) {
+        menuBtnBottom.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+            offcanvasMenu.show();
+        });
+    }
+
+    // Offcanvas menu items
+    const menuItems = document.querySelectorAll('#offcanvasMenu .nav-link');
+    menuItems.forEach(item => {
+        item.addEventListener('click', HandleMenuItemClick);
+    });
 
     // Populate regions and set up region change listener
     PopulateRegions();
     const regionSelect = document.getElementById('region');
     if (regionSelect) {
         regionSelect.addEventListener('change', (e) => { PopulateCities(e.target.value); });
-    }
-
-    const logoLink = document.getElementById('logo-link');
-    if (logoLink) {
-        logoLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await FillTheBody('home');
-        });
     }
 
     // Set up fee type and input handling
@@ -75,6 +102,35 @@ export async function SetupPostOrderPage() {
                 this.classList.remove('is-invalid');
             }
         });
+    }
+}
+
+function HandleMenuItemClick(e) {
+    e.preventDefault();
+    const href = e.target.getAttribute('href');
+
+    // Close the offcanvas menu
+    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+    if (offcanvasMenu) {
+        offcanvasMenu.hide();
+    }
+
+    // Handle the click action
+    try {
+        switch (href) {
+            case '#my-profile':
+                FillTheBody('my-profile');
+                break;
+            case '#my-orders':
+                FillTheBody('my-orders');
+                break;
+            case '#my-applications':
+                FillTheBody('my-applications');
+                break;
+        }
+    } catch (error) {
+        console.error('Error handling menu item click:', error);
+        ShowErrorMessage('오류가 발생했습니다. 다시 시도해주세요.');
     }
 }
 
@@ -129,7 +185,7 @@ async function SubmitOrder(event) {
         title,
         category,
         region: regions.find(r => r.id == regionId)?.name || '',
-        city: regionId == 9 ? '세종시' : city,  // Use '세종시' for Sejong
+        city: regionId == 9 ? '세종시' : city,  // 세종시는 별도로 처리
         fee: Number(fee),
         description
     };
@@ -154,7 +210,7 @@ async function SubmitOrder(event) {
         console.log('Order submitted successfully:', result);
 
         ShowSuccessMessage('오더가 성공적으로 제출되었습니다!');
-        // Redirect to home page after a short delay
+        // 일정 시간 후 홈으로 이동
         setTimeout(() => FillTheBody('home'), 2000);
     } catch (error) {
         console.error('Error submitting order:', error);

@@ -1,11 +1,14 @@
+// orderApplicationsPage.js
+
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo, GetStatusClass, GetStatusText } from '../utils/helpers.js';
-import { currentOrderId } from './homePage.js';
 
+export let currentOrderId = null;
 
 export async function SetupOrderApplicationsPage(params) {
-    console.log('SetupOrderApplicationsPage called with params:', params);
+    console.log('Setting up Order Applications Page with params:', params);
+
     if (!params || !params.order) {
         console.error('Invalid params for SetupOrderApplicationsPage');
         ShowErrorMessage('Invalid order information');
@@ -17,6 +20,52 @@ export async function SetupOrderApplicationsPage(params) {
     currentOrderId = order.order_id;
     console.log('Current order ID set:', currentOrderId);
 
+    SetupEventListeners();
+    DisplayOrderInfo(order);
+    await FetchAndDisplayApplications(currentOrderId);
+
+    console.log('Order Applications Page setup complete');
+}
+
+function SetupEventListeners() {
+    // Home button
+    const homeBtn = document.getElementById('home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await FillTheBody('home');
+        });
+    }
+
+    // Chat button
+    const chatBtn = document.getElementById('chat-btn');
+    if (chatBtn) {
+        chatBtn.addEventListener('click', async () => await FillTheBody('chat'));
+    }
+
+    // Post Order button
+    const postOrderBtn = document.getElementById('post-order-btn');
+    if (postOrderBtn) {
+        postOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
+    }
+
+    // Menu button
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+            offcanvasMenu.show();
+        });
+    }
+
+    // Offcanvas menu items
+    const menuItems = document.querySelectorAll('#offcanvasMenu .nav-link');
+    menuItems.forEach(item => {
+        item.addEventListener('click', HandleMenuItemClick);
+    });
+
+    // Logo link
     const logoLink = document.getElementById('logo-link');
     if (logoLink) {
         logoLink.addEventListener('click', async (e) => {
@@ -24,27 +73,40 @@ export async function SetupOrderApplicationsPage(params) {
             await FillTheBody('home');
         });
     }
+}
 
-    const backBtn = document.getElementById('back-btn');
-    if (backBtn) {
-        console.log('Back button found, setting up event listener');
-        backBtn.addEventListener('click', async () => await FillTheBody('my-orders'));
-    } else {
-        console.warn('Back button not found');
+function HandleMenuItemClick(e) {
+    e.preventDefault();
+    const href = e.target.getAttribute('href');
+
+    // Close the offcanvas menu
+    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+    if (offcanvasMenu) {
+        offcanvasMenu.hide();
     }
 
-    const refreshBtn = document.getElementById('refresh-btn');
-    if (refreshBtn) {
-        console.log('Refresh button found, setting up event listener');
-        refreshBtn.addEventListener('click', () => FetchAndDisplayApplications(currentOrderId));
-    } else {
-        console.warn('Refresh button not found');
+    // Handle the click action
+    try {
+        switch (href) {
+            case '#my-profile':
+                FillTheBody('my-profile');
+                break;
+            case '#my-orders':
+                FillTheBody('my-orders');
+                break;
+            case '#my-applications':
+                FillTheBody('my-applications');
+                break;
+        }
+    } catch (error) {
+        console.error('Error handling menu item click:', error);
+        ShowErrorMessage('오류가 발생했습니다. 다시 시도해주세요.');
     }
+}
 
-    // Display order info
+function DisplayOrderInfo(order) {
     const orderInfoSection = document.getElementById('order-info');
     if (orderInfoSection) {
-        console.log('Updating order info section');
         orderInfoSection.innerHTML = `
             <div class="card order-info-card">
                 <div class="card-body">
@@ -67,14 +129,10 @@ export async function SetupOrderApplicationsPage(params) {
     } else {
         console.error('Order info section not found');
     }
-
-    console.log('Calling FetchAndDisplayApplications');
-    await FetchAndDisplayApplications(currentOrderId);
-    console.log('SetupOrderApplicationsPage completed');
 }
 
 async function FetchAndDisplayApplications(orderId) {
-    console.log('FetchAndDisplayApplications called with orderId:', orderId);
+    console.log('Fetching applications for order ID:', orderId);
     if (!orderId) {
         console.error('Invalid order ID');
         ShowErrorMessage('유효하지 않은 주문 ID입니다.');
@@ -82,7 +140,6 @@ async function FetchAndDisplayApplications(orderId) {
     }
 
     try {
-        console.log('Making API request to fetch applications');
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/GetOrderApplications', {
             method: 'POST',
             headers: {
@@ -96,17 +153,13 @@ async function FetchAndDisplayApplications(orderId) {
         }
 
         const result = await response.json();
-        console.log('API Response:', result);
 
         if (!result.success || !result.applications || !Array.isArray(result.applications)) {
             throw new Error('Invalid response format: applications array not found or request unsuccessful');
         }
 
-        console.log('Fetching order status');
         const orderStatus = await FetchOrderStatus(orderId);
-        console.log('Order status:', orderStatus);
 
-        console.log('Displaying application list');
         DisplayApplicationList(result.applications, orderStatus);
     } catch (error) {
         console.error('Error fetching order applications:', error);
@@ -139,7 +192,7 @@ async function FetchOrderStatus(orderId) {
 function DisplayApplicationList(applications, orderStatus) {
     const container = document.getElementById('applications-list');
     container.innerHTML = '';
-    
+
     const isOrderClosed = orderStatus === 'closed';
 
     if (applications.length === 0) {
@@ -148,19 +201,28 @@ function DisplayApplicationList(applications, orderStatus) {
     }
 
     applications.forEach(application => {
-        const applicationElement = document.createElement('div');
-        applicationElement.className = 'application-item mb-3 p-3 border rounded';
-        applicationElement.setAttribute('data-application-id', application.application_id);
-        applicationElement.innerHTML = `
-            <h5>${application.applicant_name || '이름 없음'}</h5>
-            <p>예상 완료 시간: ${application.estimated_completion}</p>
-            <p>상태: <span class="badge ${GetStatusClass(application.status)}">${GetStatusText(application.status)}</span></p>
-            <button class="btn btn-primary btn-sm view-application">상세 보기</button>
-        `;
-        container.appendChild(applicationElement);
+        const template = document.getElementById('application-item-template');
+        if (!template) {
+            console.error('Application item template not found');
+            return;
+        }
 
-        // Add event listeners
-        applicationElement.querySelector('.view-application').addEventListener('click', () => ShowApplicationDetails(application, isOrderClosed));
+        const applicationElement = template.content.cloneNode(true);
+
+        const applicationItem = applicationElement.querySelector('.application-item');
+        applicationItem.setAttribute('data-application-id', application.application_id);
+
+        applicationElement.querySelector('.applicant-name').textContent = application.applicant_name || '이름 없음';
+        const statusBadge = applicationElement.querySelector('.application-status');
+        statusBadge.textContent = GetStatusText(application.status);
+        statusBadge.className = `badge ${GetStatusClass(application.status)}`;
+
+        applicationElement.querySelector('.estimated-completion').textContent = application.estimated_completion;
+        applicationElement.querySelector('.application-date').textContent = GetTimeAgo(application.created_at);
+
+        applicationItem.addEventListener('click', () => ShowApplicationDetails(application, isOrderClosed));
+
+        container.appendChild(applicationElement);
     });
 }
 
@@ -242,15 +304,14 @@ function ShowApplicationDetails(application, isOrderClosed) {
 }
 
 async function AcceptApplication(applicationId) {
-    console.log(`Initiating application acceptance. Application ID: ${applicationId}, Order ID: ${currentOrderId}`);
-    
+    console.log(`Accepting application ID: ${applicationId} for order ID: ${currentOrderId}`);
+
     if (!confirm('이 지원서를 수락하시겠습니까? 다른 모든 지원서는 자동으로 거절됩니다.')) {
         console.log('User cancelled application acceptance');
         return;
     }
 
     try {
-        console.log('Sending AcceptApplication request to backend');
         const acceptResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/AcceptApplication', {
             method: 'POST',
             headers: {
@@ -262,62 +323,26 @@ async function AcceptApplication(applicationId) {
             })
         });
 
-        console.log('Received response from AcceptApplication endpoint:', acceptResponse);
-
         if (!acceptResponse.ok) {
             throw new Error(`Failed to accept application. Status: ${acceptResponse.status}`);
         }
 
         const acceptResult = await acceptResponse.json();
-        console.log('Parsed response body:', acceptResult);
 
         if (!acceptResult.success) {
-            throw new Error(result.error || 'Failed to accept application');
+            throw new Error(acceptResult.error || 'Failed to accept application');
         }
 
-        console.log('Application accepted successfully');
-
-        console.log('Sending notification to applicant');
-        const notifyResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/NotifyApplicantOfAcceptance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                application_id: applicationId
-            })
-        });
-
-        console.log('Received response from NotifyApplicantOfAcceptance endpoint:', notifyResponse);
-
-        if (!notifyResponse.ok) {
-            throw new Error(`Failed to send notification. Status: ${notifyResponse.status}`);
-        }
-
-        const notifyResult = await notifyResponse.json();
-        console.log('Parsed notification response:', notifyResult);
-
-        if (!notifyResult.success) {
-            throw new Error(notifyResult.error || 'Failed to send notification');
-        }
-
-        console.log('Notification sent successfully to the applicant');
-        
-        if (acceptResult.sendbird_channel_url) {
-            console.log('Sendbird channel URL received:', acceptResult.sendbird_channel_url);
-            // You might want to store this URL or use it to redirect to the chat
-
-        }
+        // Notify the applicant
+        await NotifyApplicant(applicationId, 'acceptance');
 
         ShowSuccessMessage('지원서가 성공적으로 수락되었습니다.', 3000);
-        
-        // Update UI immediately
-        console.log('Updating UI for accepted application');
+
+        // Update UI
         UpdateApplicationStatus(applicationId, 'accepted');
         DisableApplicationActions();
-        
-        // Then refresh the applications list
-        console.log('Refreshing applications list');
+
+        // Refresh the applications list
         await FetchAndDisplayApplications(currentOrderId);
     } catch (error) {
         console.error('Error accepting application:', error);
@@ -351,40 +376,15 @@ async function RejectApplication(applicationId) {
             throw new Error(result.error || 'Failed to reject application');
         }
 
-        try {
-            const notifyResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/NotifyApplicantOfRejection', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    application_id: applicationId
-                })
-            });
-
-            if (!notifyResponse.ok) {
-                throw new Error(`알림 전송에 실패했습니다. 상태 코드: ${notifyResponse.status}`);
-            }
-
-            const notifyResult = await notifyResponse.json();
-            if (!notifyResult.success) {
-                throw new Error(notifyResult.error || '알림 전송에 실패했습니다.');
-            }
-
-            console.log('지원자에게 알림이 성공적으로 전송되었습니다.');
-
-        } catch (error) {
-            console.error('지원자에게 알림 전송 중 오류 발생:', error);
-            // 알림 전송 실패 시 사용자에게 알릴지 결정하세요.
-            // ShowErrorMessage('지원자에게 알림을 보내는 중 오류가 발생했습니다.');
-        }
+        // Notify the applicant
+        await NotifyApplicant(applicationId, 'rejection');
 
         ShowSuccessMessage('지원서가 성공적으로 거절되었습니다.', 3000);
-        
-        // Update UI immediately
+
+        // Update UI
         UpdateApplicationStatus(applicationId, 'rejected');
-        
-        // Then refresh the applications list
+
+        // Refresh the applications list
         await FetchAndDisplayApplications(currentOrderId);
     } catch (error) {
         console.error('Error rejecting application:', error);
@@ -392,8 +392,35 @@ async function RejectApplication(applicationId) {
     }
 }
 
-async function RejectAllApplications() {
-    ShowErrorMessage('일괄 거절 기능은 아직 구현되지 않았습니다.');
+async function NotifyApplicant(applicationId, action) {
+    const endpoint = action === 'acceptance' ? 'NotifyApplicantOfAcceptance' : 'NotifyApplicantOfRejection';
+
+    try {
+        const notifyResponse = await MakeAuthenticatedRequest(`https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                application_id: applicationId
+            })
+        });
+
+        if (!notifyResponse.ok) {
+            throw new Error(`Failed to send notification. Status: ${notifyResponse.status}`);
+        }
+
+        const notifyResult = await notifyResponse.json();
+
+        if (!notifyResult.success) {
+            throw new Error(notifyResult.error || 'Failed to send notification');
+        }
+
+        console.log('Notification sent successfully to the applicant');
+    } catch (error) {
+        console.error('Error notifying applicant:', error);
+        // Decide whether to inform the user about notification failure
+    }
 }
 
 function DisableApplicationActions() {
@@ -409,13 +436,13 @@ function DisableApplicationActions() {
 function UpdateApplicationStatus(applicationId, status) {
     const applicationElement = document.querySelector(`[data-application-id="${applicationId}"]`);
     if (applicationElement) {
-        const statusBadge = applicationElement.querySelector('.badge');
+        const statusBadge = applicationElement.querySelector('.application-status');
         if (statusBadge) {
             statusBadge.textContent = GetStatusText(status);
             statusBadge.className = `badge ${GetStatusClass(status)}`;
         }
     }
-    
+
     // Close the modal after updating the status
     const modal = bootstrap.Modal.getInstance(document.getElementById('applicationDetailsModal'));
     if (modal) {

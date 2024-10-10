@@ -39,10 +39,10 @@ function SetupMyOrdersEventListeners() {
         newOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
     }
 
-    // Refresh button
-    const refreshBtn = document.getElementById('refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', RefreshMyOrderPosts);
+    // Chat button
+    const chatBtn = document.getElementById('chat-btn');    
+    if (chatBtn) {
+        chatBtn.addEventListener('click', async () => await FillTheBody('chat'));
     }
 
     // Menu button
@@ -109,7 +109,6 @@ function SetupMyOrdersFilterAndSort() {
 
 async function FetchAndDisplayMyOrderPosts(page = 1) {
     try {
-        ShowLoadingSpinner();
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/GetOrders', {
             method: 'POST',
             headers: {
@@ -129,18 +128,14 @@ async function FetchAndDisplayMyOrderPosts(page = 1) {
         }
 
         const result = await response.json();
-        console.log('Fetched my orders:', result.orders);
-        if (result.success && Array.isArray(result.orders)) {
-            DisplayMyOrderPosts(result.orders);
-            UpdatePagination(page, result.totalPages || 1);
-        } else {
-            throw new Error('Invalid response format');
-        }
+        const myOrderPosts = result.orders;
+        const totalPages = result.totalPages || 1;
+
+        DisplayMyOrderPosts(myOrderPosts);
+        UpdatePagination(page, totalPages);
     } catch (error) {
         console.error('Error fetching my orders:', error);
         ShowErrorMessage('내 오더를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-        HideLoadingSpinner();
     }
 }
 
@@ -218,17 +213,6 @@ function DisplayMyOrderPosts(myOrders) {
             console.error('Error populating order card:', error);
         }
     });
-}
-
-async function RefreshMyOrderPosts() {
-    console.log('Refreshing My Orders');
-    try {
-        await FetchAndDisplayMyOrderPosts(1);
-        ShowSuccessMessage('내 오더 목록이 새로고침되었습니다.', 3000);
-    } catch (error) {
-        console.error('Error refreshing my order posts:', error);
-        ShowErrorMessage('내 오더 목록 새로고침 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
 }
 
 function ShowMyOrderDetails(order) {
@@ -372,7 +356,7 @@ function HandleMenuItemClick(e) {
     // Handle the click action
     try {
         switch (href) {
-            case '#profile':
+            case '#my-profile':
                 FillTheBody('my-profile');
                 break;
             case '#my-orders':
@@ -380,9 +364,6 @@ function HandleMenuItemClick(e) {
                 break;
             case '#my-applications':
                 FillTheBody('my-applications');
-                break;
-            case '#logout':
-                Logout();
                 break;
         }
     } catch (error) {

@@ -1,9 +1,9 @@
+// myApplicationsPage.js
+
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo, GetStatusClass, GetStatusText } from '../utils/helpers.js';
 import { postsPerPage, UpdatePagination } from './homePage.js';
-
-
 
 let myApplicationsCurrentFilters = {
     status: ''
@@ -16,29 +16,59 @@ let currentPage = 1;
 let applicationDetailsModalInstance = null;
 
 export async function SetupMyApplicationsPage() {
-    console.log('Setting up my applications page');
+    console.log('Setting up My Applications page');
 
-    const logoLink = document.getElementById('logo-link');
-    if (logoLink) {
-        logoLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await FillTheBody('home');
+    SetupMyApplicationsEventListeners();
+    SetupMyApplicationsFilterAndSort();
+
+    await FetchAndDisplayMyApplications(1);
+
+    console.log('My Applications page setup complete');
+}
+
+function SetupMyApplicationsEventListeners() {
+    // Home button
+    const homeBtn = document.getElementById('home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', async () => await FillTheBody('home'));
+    }
+
+    // Chat button
+    const chatBtn = document.getElementById('chat-btn');
+    if (chatBtn) {
+        chatBtn.addEventListener('click', async () => await FillTheBody('chat'));
+    }
+
+    // Post Order button
+    const postOrderBtn = document.getElementById('post-order-btn');
+    if (postOrderBtn) {
+        postOrderBtn.addEventListener('click', async () => {
+            try {
+                await FillTheBody('post-order');
+            } catch (error) {
+                console.error('Error loading post order page:', error);
+                ShowErrorMessage('오더 등록 중에 오류가 발생했습니다. 다시 시도해주세요.');
+            }
         });
     }
 
-    const backBtn = document.getElementById('back-btn');
-    if (backBtn) {
-        backBtn.addEventListener('click', async () => await FillTheBody('home'));
+    // Menu button
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+            offcanvasMenu.show();
+        });
     }
 
-    const refreshBtn = document.getElementById('refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', RefreshMyApplications);
-    }
+    // Offcanvas menu items
+    const menuItems = document.querySelectorAll('#offcanvasMenu .nav-link');
+    menuItems.forEach(item => {
+        item.addEventListener('click', HandleMenuItemClick);
+    });
 
-    SetupMyApplicationsFilterAndSort();
-    await FetchAndDisplayMyApplications(1);
-
+    // Pagination
     const paginationContainer = document.getElementById('pagination-container');
     if (paginationContainer) {
         paginationContainer.addEventListener('click', async (e) => {
@@ -50,7 +80,51 @@ export async function SetupMyApplicationsPage() {
         });
     }
 
-    console.log('My applications page setup complete');
+    // Setup pull-to-refresh for my-applications page
+    SetupMyApplicationsPullToRefresh();
+}
+
+function SetupMyApplicationsPullToRefresh() {
+    let isRefreshing = false;
+    let startY = 0;
+    const refreshThreshold = 40;
+
+    const contentContainer = document.getElementById('my-applications-page-content');
+
+    contentContainer.addEventListener('touchstart', (e) => {
+        if (contentContainer.scrollTop === 0) {
+            startY = e.touches[0].pageY;
+        }
+    });
+
+    contentContainer.addEventListener('touchmove', (e) => {
+        if (!isRefreshing && startY > 0) {
+            const currentY = e.touches[0].pageY;
+            const pullDistance = currentY - startY;
+
+            if (pullDistance > refreshThreshold && contentContainer.scrollTop === 0) {
+                isRefreshing = true;
+                TriggerRefresh();
+            }
+        }
+    });
+
+    contentContainer.addEventListener('touchend', () => {
+        startY = 0;
+        isRefreshing = false;
+    });
+}
+
+async function TriggerRefresh() {
+    console.log('Pull-to-refresh: Starting refresh on My Applications');
+    try {
+        await FetchAndDisplayMyApplications(1);
+        ShowSuccessMessage('내 지원서 목록이 새로고침되었습니다.', 3000);
+        console.log('Pull-to-refresh: Refresh completed successfully');
+    } catch (error) {
+        console.error('Error refreshing my applications:', error);
+        ShowErrorMessage('내 지원서 목록 새로고침 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
 }
 
 async function FetchAndDisplayMyApplications(page = 1) {
@@ -163,16 +237,6 @@ function SetupMyApplicationsFilterAndSort() {
     });
 }
 
-async function RefreshMyApplications() {
-    try {
-        await FetchAndDisplayMyApplications(1);
-        ShowSuccessMessage('내 지원서 목록이 새로고침되었습니다.', 3000);
-    } catch (error) {
-        console.error('Error refreshing my applications:', error);
-        ShowErrorMessage('내 지원서 목록 새로고침 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
-}
-
 async function WithdrawApplication(applicationId) {
     if (!confirm('정말로 이 지원을 철회하시겠습니까?')) {
         return;
@@ -201,10 +265,9 @@ async function WithdrawApplication(applicationId) {
         // Hide the application details modal
         if (applicationDetailsModalInstance) {
             applicationDetailsModalInstance.hide();
-            // Reset the modal instance to null
             applicationDetailsModalInstance = null;
         }
-        
+
         await FetchAndDisplayMyApplications(currentPage);
     } catch (error) {
         console.error('Error withdrawing application:', error);
@@ -239,7 +302,7 @@ function ShowMyApplicationDetails(application) {
     modalBody.innerHTML = `
         <div class="mb-4">
             <h5 class="mb-3"><i class="bi bi-briefcase me-2"></i>${application.order_title}</h5>
-            <div class="d-flex align-items-center mb-2">
+            <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="me-3"><strong>상태:</strong> <span class="badge ${GetStatusClass(application.status)}">${GetStatusText(application.status)}</span></span>
                 <span><strong>예상 완료 시간:</strong> ${application.estimated_completion}</span>
             </div>
@@ -271,16 +334,42 @@ function ShowMyApplicationDetails(application) {
     applicationDetailsModalInstance.show();
 
     // Add withdraw button if the application is still pending
-    const modalFooter = document.querySelector('#applicationDetailsModal .modal-footer');
-    if (modalFooter) {
-        modalFooter.innerHTML = `
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            ${application.status === 'pending' ? '<button type="button" class="btn btn-danger" id="withdrawApplicationBtn">지원 철회</button>' : ''}
-        `;
-
-        const withdrawBtn = document.getElementById('withdrawApplicationBtn');
-        if (withdrawBtn) {
+    const withdrawBtn = document.getElementById('withdrawApplicationBtn');
+    if (withdrawBtn) {
+        if (application.status === 'pending') {
+            withdrawBtn.style.display = 'inline-block';
             withdrawBtn.onclick = () => WithdrawApplication(application.application_id);
+        } else {
+            withdrawBtn.style.display = 'none';
         }
+    }
+}
+
+function HandleMenuItemClick(e) {
+    e.preventDefault();
+    const href = e.target.getAttribute('href');
+
+    // Close the offcanvas menu
+    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+    if (offcanvasMenu) {
+        offcanvasMenu.hide();
+    }
+
+    // Handle the click action
+    try {
+        switch (href) {
+            case '#my-profile':
+                FillTheBody('my-profile');
+                break;
+            case '#my-orders':
+                FillTheBody('my-orders');
+                break;
+            case '#my-applications':
+                FillTheBody('my-applications');
+                break;
+        }
+    } catch (error) {
+        console.error('Error handling menu item click:', error);
+        ShowErrorMessage('오류가 발생했습니다. 다시 시도해주세요.');
     }
 }

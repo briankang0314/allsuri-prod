@@ -8,45 +8,31 @@
         --border-radius: 15px;
         --btn-padding: 0.375rem 1rem;
         --font-family: 'Noto Sans KR', sans-serif;
+        --header-height: 60px;
+        --bottom-nav-height: 80px;
     }
 
     body {
         font-family: var(--font-family);
         background-color: var(--primary-bg-color);
+        margin: 0;
     }
 
-    .container-fluid {
-        max-width: 1200px;
-    }
-
-    /* Header styles consistent with other pages */
-    .header {
-        background-color: var(--secondary-bg-color);
-        border-radius: var(--border-radius);
-        box-shadow: var(--primary-shadow);
-        padding: 15px 20px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-        margin-right: 10px;
-    }
-
-    .logo:hover {
-        transform: scale(1.1);
+    /* Content Wrapper to account for fixed header and bottom nav */
+    #order-applications-content {
+        padding-top: var(--header-height);
+        padding-bottom: var(--bottom-nav-height);
+        overflow-y: auto;
+        height: 100vh;
+        box-sizing: border-box;
     }
 
     .btn {
-        border-radius: 20px;
+        border-radius: var(--border-radius);
         padding: var(--btn-padding);
         transition: all 0.3s ease;
+        min-width: 44px;
+        min-height: 44px;
     }
 
     .btn:hover {
@@ -63,7 +49,7 @@
         background-color: #e9ecef;
     }
 
-    /* Content styles */
+    /* Order Info Card */
     .order-info-card {
         background-color: var(--secondary-bg-color);
         border-radius: var(--border-radius);
@@ -78,6 +64,7 @@
         box-shadow: var(--primary-shadow);
     }
 
+    /* Application Item */
     .application-item {
         background-color: var(--secondary-bg-color);
         border-radius: var(--border-radius);
@@ -102,20 +89,63 @@
         border-radius: var(--border-radius);
     }
 
-    /* Responsive styles */
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--secondary-bg-color);
+        box-shadow: var(--primary-shadow);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        padding-top: 10px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+
+    .bottom-nav .nav-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .bottom-nav .nav-link,
+    .bottom-nav .navbar-toggler {
+        color: #000;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        width: 100%;
+    }
+
+    .bottom-nav .nav-link .bi,
+    .bottom-nav .navbar-toggler .bi {
+        font-size: 24px;
+        margin-bottom: 0px;
+    }
+
+    .navbar-toggler {
+        border: none;
+        background: transparent;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .offcanvas.offcanvas-end {
+        width: 200px; /* Adjust the width as needed */
+    }
+
     @media (max-width: 768px) {
-        .header {
-            padding: 15px;
-        }
-
         .header h1 {
-            font-size: 1.75rem;
-        }
-
-        .logo {
-            width: 35px;
-            height: 35px;
-            margin-right: 8px;
+            font-size: 1.25rem;
         }
 
         .btn {
@@ -133,18 +163,8 @@
     }
 
     @media (max-width: 576px) {
-        .header {
-            padding: 10px 15px;
-        }
-
         .header h1 {
-            font-size: 1.5rem;
-        }
-
-        .logo {
-            width: 30px;
-            height: 30px;
-            margin-right: 5px;
+            font-size: 1rem;
         }
 
         .btn {
@@ -160,36 +180,74 @@
             padding: 10px;
         }
     }
-
 </style>
 
-<div class="container-fluid">
-    <header class="header">
-        <div class="d-flex align-items-center">
-            <a href="#" id="logo-link">
-                <img src="/favicon.ico" alt="올수리 로고" class="logo">
-            </a>
-            <h1 class="h3 fw-bold m-0">지원자 보기</h1>
-        </div>
-        <div class="d-flex align-items-center">
-            <button id="refresh-btn" class="btn btn-refresh me-2">
-                <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-sm-inline">새로고침</span>
-            </button>
-            <button id="back-btn" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">뒤로</span>
-            </button>
-        </div>
-    </header>
-
+<!-- Content -->
+<div class="container-fluid" id="order-applications-content">
     <main role="main">
+        <!-- Order Information -->
         <section id="order-info" class="mb-4">
             <!-- Order information will be dynamically inserted here -->
         </section>
 
+        <!-- Applications List -->
         <section id="applications-list">
             <!-- Applications will be dynamically inserted here -->
         </section>
     </main>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="navbar navbar-expand navbar-light bottom-nav">
+    <div class="container-fluid">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item">
+                <a href="#" id="home-btn" class="nav-link">
+                    <i class="bi bi-house-fill"></i>
+                    <span>홈</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="post-order-btn" class="nav-link">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>새 오더</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="chat-btn" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>채팅</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="menu-btn" class="nav-link">
+                    <i class="bi bi-list"></i>
+                    <span>메뉴</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Offcanvas Menu -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">메뉴</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="#my-profile">내 프로필</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-orders">내 오더</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-applications">내 지원서</a>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <!-- Application Details Modal -->

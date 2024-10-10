@@ -22,7 +22,7 @@ export async function SetupChatPage() {
 
         AddChannelHandler();
 
-        setupEventListeners();
+        SetupEventListeners();
 
         // Load and display channel list
         await LoadChannelList();
@@ -31,7 +31,7 @@ export async function SetupChatPage() {
     }
 }
 
-function setupEventListeners() {
+function SetupEventListeners() {
     // Send message on button click
     const sendButton = document.getElementById('sendButton');
     sendButton.addEventListener('click', async () => {
@@ -80,6 +80,24 @@ function setupEventListeners() {
         const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
         offcanvasMenu.toggle();
     });
+
+    const menuItems = document.querySelectorAll('#offcanvasMenu .nav-link');
+    menuItems.forEach(item => {
+        item.addEventListener('click', handleMenuItemClick);
+    });
+}
+
+async function handleMenuItemClick(event) {
+    event.preventDefault();
+    const href = event.target.getAttribute('href');
+    const pageName = href.substring(1); // Remove the '#' from the href
+
+    // Close the offcanvas menu
+    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+    offcanvasMenu.hide();
+
+    // Navigate to the selected page
+    await FillTheBody(pageName);
 }
 
 async function LoadChannelList() {

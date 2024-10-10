@@ -126,7 +126,6 @@ async function FetchAndDisplayOrderPosts(page = 1) {
         }
         const result = await response.json();
         const orderPosts = result.orders;
-        // console.log('Fetched order posts:', orderPosts);
         const totalPages = result.totalPages || 1;
 
         DisplayOrderPosts(orderPosts);
@@ -283,7 +282,6 @@ function SetupPullToRefresh() {
     const contentContainer = document.getElementById('home-page-content');
 
     contentContainer.addEventListener('touchstart', (e) => {
-        // Allow pull-to-refresh when scrolled near the top
         if (window.scrollY <= 10) {
             startY = e.touches[0].pageY;
         }
@@ -294,7 +292,6 @@ function SetupPullToRefresh() {
             const currentY = e.touches[0].pageY;
             const pullDistance = currentY - startY;
 
-            // Trigger refresh if pull distance exceeds threshold
             if (pullDistance > refreshThreshold && window.scrollY <= 10) {
                 isRefreshing = true;
                 TriggerRefresh();
@@ -334,7 +331,7 @@ function HandleMenuItemClick(e) {
     // Handle the click action
     try {
         switch (href) {
-            case '#profile':
+            case '#my-profile':
                 FillTheBody('my-profile');
                 break;
             case '#my-orders':
@@ -342,9 +339,6 @@ function HandleMenuItemClick(e) {
                 break;
             case '#my-applications':
                 FillTheBody('my-applications');
-                break;
-            case '#logout':
-                Logout();
                 break;
         }
     } catch (error) {

@@ -78,7 +78,7 @@ function SetupMyProfileEventListeners() {
     }
 
     // Offcanvas menu links
-    const profileLink = document.querySelector('.offcanvas-body .nav-link[href="#profile"]');
+    const profileLink = document.querySelector('.offcanvas-body .nav-link[href="#my-profile"]');
     if (profileLink) {
         profileLink.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -197,6 +197,18 @@ function UpdatePreferredCategories(categories) {
         badge.textContent = category;
         categoriesContainer.appendChild(badge);
     });
+}
+
+export function ShowIncompleteProfileWarning() {
+    const warningElement = document.getElementById('incomplete-profile-warning');
+    if (warningElement) {
+        warningElement.style.display = 'block';
+    }
+
+    const completeProfileBtn = document.getElementById('complete-profile-btn');
+    if (completeProfileBtn) {
+        completeProfileBtn.addEventListener('click', () => FillTheBody('edit-profile'));
+    }
 }
 
 function InitializeAnimations() {

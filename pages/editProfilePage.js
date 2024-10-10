@@ -4,10 +4,7 @@ import { FetchUserProfile } from './myProfilePage.js';
 import { ShowErrorMessage, ShowSuccessMessage, PopulateRegions, PopulateCities } from '../utils/helpers.js';
 import { categories, regions } from '../utils/constants.js';
 
-
-
 export async function SetupEditProfilePage() {
-    
     try {
         console.log("Starting SetupEditProfilePage");
 
@@ -19,20 +16,40 @@ export async function SetupEditProfilePage() {
             });
         }
 
-        const backBtn = document.getElementById('back-btn');
-        console.log("Back button found:", !!backBtn);
-        if (backBtn) {
-            backBtn.addEventListener('click', async () => await FillTheBody('my-profile'));
+        const menuBtn = document.getElementById('menu-btn');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+                offcanvasMenu.show();
+            });
+        }
+
+        const homeBtn = document.getElementById('home-btn');
+        if (homeBtn) {
+            homeBtn.addEventListener('click', async () => await FillTheBody('home'));
+        }
+
+        const postOrderBtn = document.getElementById('post-order-btn');
+        if (postOrderBtn) {
+            postOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
+        }
+
+        const chatBtn = document.getElementById('chat-btn');
+        if (chatBtn) {
+            chatBtn.addEventListener('click', async () => await FillTheBody('chat'));
+        }
+
+        const myProfileBtn = document.getElementById('my-profile-btn');
+        if (myProfileBtn) {
+            myProfileBtn.addEventListener('click', async () => await FillTheBody('my-profile'));
         }
 
         const saveProfileChangesBtn = document.getElementById('btn-save-profile');
-        console.log("Save button found:", !!saveProfileChangesBtn);
         if (saveProfileChangesBtn) {
             saveProfileChangesBtn.addEventListener('click', SaveProfileChanges);
         }
 
         const phoneInput = document.getElementById('editPhone');
-        console.log("Phone input found:", !!phoneInput);
         if (phoneInput) {
             phoneInput.addEventListener('input', function (e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
@@ -64,11 +81,8 @@ function PopulateEditProfileForm(profile) {
     PopulateRegions();
     const regionSelect = document.getElementById('region');
     const selectedRegion = regions.find(r => r.name === profile.region);
-    console.log('Profile region:', profile.region);
-    console.log('Selected region:', selectedRegion);
 
     regionSelect.value = selectedRegion?.id ?? '';
-    console.log('Region select value:', regionSelect.value);
     regionSelect.addEventListener('change', (e) => { PopulateCities(e.target.value); });
 
     if (regionSelect.value) {
@@ -102,11 +116,8 @@ async function SaveProfileChanges() {
         city: document.getElementById('region').value == 9 ? '세종시' : document.getElementById('city').value,
         preferred_categories: Array.from(document.querySelectorAll('#categoryCheckboxes input:checked')).map(input => input.value)
     };
-    
-    console.log('Updated profile:', updatedProfile);
 
     try {
-        console.log('Updating profile...');
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/UpdateProfile', {
             method: 'POST',
             headers: {
@@ -119,7 +130,6 @@ async function SaveProfileChanges() {
         });
 
         const result = await response.json();
-        console.log('Profile update result:', result);
 
         if (result.success) {
             ShowSuccessMessage('프로필이 성공적으로 업데이트되었습니다.', 3000);
@@ -129,10 +139,8 @@ async function SaveProfileChanges() {
             localStorage.setItem('user', JSON.stringify(user));
 
             if (await CheckProfileCompleteness()) {
-                console.log('Profile is complete');
                 await FillTheBody('my-profile');
             } else {
-                console.log('Profile is incomplete');
                 await FillTheBody('my-profile');
             }
         } else {
@@ -148,6 +156,6 @@ export async function CheckProfileCompleteness() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user) return false;
 
-    const requiredFields = ['phone', 'region', 'city', 'preferred_categories'];
+    const requiredFields = ['nickname', 'phone', 'region', 'city', 'preferred_categories'];
     return requiredFields.every(field => user[field] && user[field].length > 0);
 }

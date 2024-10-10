@@ -8,6 +8,8 @@
         --border-radius: 15px;
         --btn-padding: 0.375rem 1rem;
         --font-family: 'Noto Sans KR', sans-serif;
+        --header-height: 80px;
+        --bottom-nav-height: 80px;
     }
 
     body {
@@ -17,17 +19,17 @@
         padding: 0;
     }
 
-    .container-fluid {
-        max-width: 1200px;
-    }
-
-    /* Header styles consistent with other pages */
+    /* Header styles */
     .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-height);
         background-color: var(--secondary-bg-color);
-        border-radius: var(--border-radius);
+        z-index: 1000;
         box-shadow: var(--primary-shadow);
-        padding: 15px 20px;
-        margin-bottom: 20px;
+        padding: 15px 10px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -46,6 +48,8 @@
     }
 
     .btn {
+        min-width: 44px;
+        min-height: 44px;
         border-radius: 20px;
         padding: var(--btn-padding);
         transition: all 0.3s ease;
@@ -55,22 +59,19 @@
         transform: translateY(-2px);
     }
 
-    .btn-back {
-        background-color: #f8f9fa;
-        color: #000000;
-        border: 1px solid #ced4da;
-    }
-
-    .btn-back:hover {
-        background-color: #e9ecef;
+    /* Content styles */
+    #edit-profile-page-content {
+        margin-top: var(--header-height);
+        padding: 20px 15px;
+        padding-bottom: calc(var(--bottom-nav-height) + 20px);
+        background-color: var(--primary-bg-color);
     }
 
     .content {
         background-color: var(--secondary-bg-color);
         border-radius: var(--border-radius);
         box-shadow: var(--primary-shadow);
-        padding: 2rem;
-        margin-bottom: 20px;
+        padding: 20px;
     }
 
     .form-control, .form-select {
@@ -78,6 +79,9 @@
         padding: 0.75rem 1rem;
         border: 1px solid #ced4da;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        font-size: 14px;
+        width: 100%;
+        height: 44px;
     }
 
     .form-control:focus, .form-select:focus {
@@ -92,82 +96,101 @@
     }
 
     .btn-save-profile {
-        background-color: #007bff;
+        background-color: #6c757d;
         color: #ffffff;
         border: none;
+        width: 100%;
+        min-height: 44px;
+        margin-top: 10px;
     }
 
     .btn-save-profile:hover {
-        background-color: #0056b3;
+        background-color: #5a6268;
     }
 
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--secondary-bg-color);
+        box-shadow: var(--primary-shadow);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        padding-top: 10px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+
+    .bottom-nav .nav-item {
+        flex: 1;
+        text-align: center;
+    }
+
+    .bottom-nav .nav-link,
+    .bottom-nav .navbar-toggler {
+        color: #000;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        width: 100%;
+    }
+
+    .bottom-nav .nav-link .bi,
+    .bottom-nav .navbar-toggler .bi {
+        font-size: 24px;
+        margin-bottom: 0px;
+    }
+
+    .navbar-toggler {
+        border: none;
+        background: transparent;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .offcanvas.offcanvas-end {
+        width: 200px; /* Adjust the width as needed */
+    }
+
+    /* Responsive adjustments */
     @media (max-width: 768px) {
         .header {
             padding: 15px;
-        }
-
-        .header h1 {
-            font-size: 1.75rem;
-        }
-
-        .logo {
-            width: 35px;
-            height: 35px;
-            margin-right: 8px;
-        }
-
-        .btn {
-            font-size: 0.9rem;
-            padding: 0.3rem 0.8rem;
-        }
-
-        .content {
-            padding: 1.5rem;
+            height: auto;
         }
     }
 
-    @media (max-width: 576px) {
-        .header {
-            padding: 10px 15px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-        }
-
-        .logo {
-            width: 30px;
-            height: 30px;
-            margin-right: 5px;
-        }
-
-        .btn {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.7rem;
-        }
-
-        .content {
-            padding: 1rem;
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .bottom-nav {
+            height: auto;
         }
     }
-
 </style>
 
-<div class="container-fluid">
-    <header class="header">
-        <div class="d-flex align-items-center">
-            <a href="#" id="logo-link">
-                <img src="/favicon.ico" alt="올수리 로고" class="logo">
-            </a>
-            <h1 class="h3 fw-bold m-0">프로필 수정</h1>
-        </div>
-        <button id="back-btn" class="btn btn-back">
-            <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">홈으로</span>
-        </button>
-    </header>
+<div class="header">
+    <div class="d-flex align-items-center">
+        <a href="#" id="logo-link">
+            <img src="/favicon.ico" alt="올수리 로고" class="logo">
+        </a>
+        <h1 class="h3 fw-bold m-0">프로필 수정</h1>
+    </div>
+    <button id="menu-btn" class="btn">
+        <i class="bi bi-list"></i>
+    </button>
+</div>
 
+<div class="container-fluid" id="edit-profile-page-content">
     <div class="content">
-        <h2 class="mb-4">프로필 수정</h2>
         <form id="editProfileForm">
             <div class="mb-3">
                 <label for="editNickname" class="form-label">닉네임</label>
@@ -177,33 +200,82 @@
                 <label for="editPhone" class="form-label">전화번호 (XXX-XXXX-XXXX)</label>
                 <input type="tel" class="form-control" id="editPhone" pattern="\d{3}-\d{4}-\d{4}" placeholder="010-1234-5678" required>
             </div>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="region" class="form-label">지역</label>
-                    <select class="form-select" id="region" required>
-                        <option value="">지역 선택</option>
-                        <!-- Options will be populated dynamically -->
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="city" class="form-label">도시</label>
-                    <select class="form-select" id="city" required>
-                        <option value="">도시 선택</option>
-                        <!-- Options will be populated dynamically based on selected region -->
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label for="region" class="form-label">지역</label>
+                <select class="form-select" id="region" required>
+                    <option value="">지역 선택</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="city" class="form-label">도시</label>
+                <select class="form-select" id="city" required>
+                    <option value="">도시 선택</option>
+                    <!-- Options will be populated dynamically based on selected region -->
+                </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">선호 카테고리</label>
-                <div id="categoryCheckboxes" class="row">
+                <div id="categoryCheckboxes">
                     <!-- Checkboxes will be dynamically added here -->
                 </div>
             </div>
-            <div class="text-center">
-                <button type="button" id="btn-save-profile" class="btn btn-save-profile">
-                    <i class="bi bi-save-fill"></i> 프로필 저장
-                </button>
-            </div>
+            <button type="button" id="btn-save-profile" class="btn btn-save-profile">
+                <i class="bi bi-save-fill"></i> 프로필 저장
+            </button>
         </form>
+    </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="navbar navbar-expand navbar-light bottom-nav">
+    <div class="container-fluid">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item">
+                <a href="#" id="home-btn" class="nav-link">
+                    <i class="bi bi-house-fill"></i>
+                    <span>홈</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="post-order-btn" class="nav-link">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>새 오더</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="chat-btn" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>채팅</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="my-profile-btn" class="nav-link">
+                    <i class="bi bi-person-circle"></i>
+                    <span>프로필</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Offcanvas Menu -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">메뉴</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="#my-profile">내 프로필</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-orders">내 오더</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-applications">내 지원서</a>
+            </li>
+        </ul>
     </div>
 </div>
