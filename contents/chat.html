@@ -17,6 +17,16 @@
         overflow: hidden; /* Prevent scrolling when channel is not open */
     }
 
+    #placeholder-message {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: calc(100vh - 60px); /* Adjust for bottom nav height */
+        text-align: center;
+        color: #999;
+        padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* Ensure it's above the bottom nav */
+    }
+
     /* Touch-friendly button sizes */
     .btn {
         min-width: 44px;
@@ -316,3 +326,7 @@
         <p class="channel-last-message mb-0 text-muted"></p>
     </div>
 </template>
+
+<div id="placeholder-message">
+    <p>채팅을 선택하여 열어주세요</p>
+</div>

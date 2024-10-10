@@ -131,6 +131,11 @@ function openChat() {
     const chatContainer = document.getElementById('chat-container');
     chatContainer.style.display = 'flex';
     document.body.classList.add('channel-open');
+
+    const placeholderMessage = document.getElementById('placeholder-message');
+    if (placeholderMessage) {
+        placeholderMessage.style.display = 'none';
+    }
 }
 
 function closeChat() {
@@ -215,6 +220,8 @@ async function SendMessage(channel, messageText) {
         // Manually assign necessary properties if missing
         message.sender = message.sender || sb.currentUser;
         message.createdAt = message.createdAt || Date.now();
+
+        message.message = messageText;
 
         // Display the message immediately
         DisplayMessage(message, true);
