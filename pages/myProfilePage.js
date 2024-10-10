@@ -161,8 +161,8 @@ function UpdateProfileUI(profile) {
     UpdateProfileCompletionBar(completionPercentage);
 
     // Rating and orders
-    document.getElementById('user-rating').textContent = profile.average_rating ? `${profile.average_rating.toFixed(1)}/5.0` : '아직 평가 없음';
-    document.getElementById('completed-orders').textContent = profile.completed_orders ?? '0';
+    // document.getElementById('user-rating').textContent = profile.average_rating ? `${profile.average_rating.toFixed(1)}/5.0` : '아직 평가 없음';
+    // document.getElementById('completed-orders').textContent = profile.completed_orders ?? '0';
 
     // Preferred categories
     UpdatePreferredCategories(profile.preferred_categories);
