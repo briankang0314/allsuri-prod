@@ -33,3 +33,33 @@ export function HideLoadingSpinner() {
 		spinner.remove();
 	}
 }
+
+export function ShowOverlay() {
+    const overlay = document.createElement('div');
+    overlay.id = 'app-overlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 9998;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+    
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    overlay.appendChild(spinner);
+
+    document.body.appendChild(overlay);
+}
+
+export function HideOverlay() {
+    const overlay = document.getElementById('app-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}

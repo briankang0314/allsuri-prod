@@ -2,8 +2,6 @@ import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
 import { postsPerPage, UpdatePagination, PopulateRegionFilter, PopulateCityFilter } from './homePage.js';
-import { Logout } from '../auth/auth.js';
-import { ShowLoadingSpinner, HideLoadingSpinner } from '../utils/loadingSpinner.js';
 
 let myOrdersCurrentFilters = {
     region: '',
