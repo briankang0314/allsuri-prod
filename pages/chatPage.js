@@ -86,17 +86,16 @@ async function LoadChannelList() {
     const channelListElement = document.getElementById('channelList');
     channelListElement.innerHTML = '';
 
-    const channelListQuery = sb.groupChannel.createMyGroupChannelListQuery();
-    channelListQuery.limit = 50;
-    channelListQuery.includeEmpty = true;
+    const channelListQuery = sb.groupChannel.createMyGroupChannelListQuery({
+        limit: 50,
+        includeEmpty: true,
+    });
 
     try {
         const channels = await channelListQuery.next();
         channels.forEach(channel => {
             DisplayChannelItem(channel);
         });
-
-        // Do not automatically select a channel; let the user choose
     } catch (error) {
         console.error('Error loading channel list:', error);
     }
@@ -114,14 +113,30 @@ function DisplayChannelItem(channel) {
 
     channelItem.addEventListener('click', async () => {
         currentChannel = channel;
+
         // Close the channel list offcanvas
         const offcanvasChannelList = bootstrap.Offcanvas.getInstance(document.getElementById('channelListOffcanvas'));
         offcanvasChannelList.hide();
+
+        // Show the chat interface
+        openChat();
 
         await LoadMessages(currentChannel);
     });
 
     channelListElement.appendChild(channelItem);
+}
+
+function openChat() {
+    const chatContainer = document.getElementById('chat-container');
+    chatContainer.style.display = 'flex';
+    document.body.classList.add('channel-open');
+}
+
+function closeChat() {
+    const chatContainer = document.getElementById('chat-container');
+    chatContainer.style.display = 'none';
+    document.body.classList.remove('channel-open');
 }
 
 async function LoadMessages(channel) {
@@ -173,9 +188,7 @@ function DisplayMessage(message, shouldScroll) {
 
     const contentElement = messageItem.querySelector('.message-content');
     contentElement.classList.add(isSentByCurrentUser ? 'sent' : 'received');
-
-    // Correctly access the message text
-    contentElement.textContent = message.message || message.plainText || message.messageText || '';
+    contentElement.textContent = message.message || '';
 
     const timestampElement = messageItem.querySelector('.message-timestamp');
 
@@ -193,13 +206,17 @@ function DisplayMessage(message, shouldScroll) {
 async function SendMessage(channel, messageText) {
     const params = {
         message: messageText,
-        // Add a unique request ID to identify the message
-        requestId: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
+
     try {
         const message = await channel.sendUserMessage(params);
-        // Manually assign sender information
-        message.sender = sb.currentUser;
+        console.log('Message sent successfully');
+
+        // Manually assign necessary properties if missing
+        message.sender = message.sender || sb.currentUser;
+        message.createdAt = message.createdAt || Date.now();
+
+        // Display the message immediately
         DisplayMessage(message, true);
     } catch (error) {
         console.error('Error sending message:', error);

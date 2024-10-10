@@ -1,7 +1,7 @@
 <!-- chat.html -->
 <style>
     :root {
-        --primary-bg-color: #f8f9fa;
+        --primary-bg-color: #ffffff;
         --secondary-bg-color: #ffffff;
         --primary-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         --secondary-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -13,11 +13,8 @@
     body {
         font-family: var(--font-family);
         background-color: var(--primary-bg-color);
-        margin-bottom: calc(80px + env(safe-area-inset-bottom));
-    }
-
-    .container-fluid {
-        max-width: 1200px;
+        margin: 0; /* Remove bottom margin */
+        overflow: hidden; /* Prevent scrolling when channel is not open */
     }
 
     /* Touch-friendly button sizes */
@@ -29,7 +26,7 @@
     /* Bottom Navigation Bar */
     .bottom-nav {
         position: fixed;
-        bottom: 0;
+        bottom: 0; /* Align to bottom */
         left: 0;
         right: 0;
         background-color: var(--secondary-bg-color);
@@ -38,8 +35,8 @@
         justify-content: space-around;
         align-items: center;
         z-index: 1000;
-        padding-top: 10px;
-        padding-bottom: env(safe-area-inset-bottom);
+        padding-top: 5px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
 
     .bottom-nav .nav-item {
@@ -56,14 +53,20 @@
         align-items: center;
         justify-content: center;
         padding: 0;
-        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        padding-bottom: calc(5px + env(safe-area-inset-bottom));
         width: 100%;
+        height: 100%;
     }
 
     .bottom-nav .nav-link .bi,
     .bottom-nav .navbar-toggler .bi {
         font-size: 24px;
-        margin-bottom: 4px;
+        margin-bottom: 0px;
+    }
+
+    .bottom-nav .nav-link span,
+    .bottom-nav .navbar-toggler span {
+        line-height: 1;
     }
 
     .navbar-toggler {
@@ -77,43 +80,51 @@
     }
 
     /* Chat area styles */
-    #chat-area {
+    #chat-container {
+        display: none; /* Hide chat interface initially */
+        position: fixed;
+        top: 0;
+        bottom: calc(60px + env(safe-area-inset-bottom) + 70px); /* 60px for bottom nav, 70px for input */
+        left: 0;
+        right: 0;
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 80px);
-        overflow: hidden;
+        background-color: var(--secondary-bg-color);
+        z-index: 900; /* Below the bottom nav */
     }
 
     #messageList {
-        display: flex;
-        flex-direction: column;
         flex: 1;
         overflow-y: auto;
         padding: 15px;
-        background-color: var(--secondary-bg-color);
     }
 
     .message-item {
         display: flex;
         flex-direction: column;
         margin-bottom: 15px;
-        max-width: 70%;
+        max-width: 80%;
     }
 
     .message-item.sent {
-        align-self: flex-end;
+        /* Align sent messages to the right */
+        margin-left: auto;
+        align-items: flex-end;
     }
 
     .message-item.received {
-        align-self: flex-start;
+        /* Align received messages to the left */
+        margin-right: auto;
+        align-items: flex-start;
     }
 
     .message-content {
+        display: inline-block;
+        max-width: 100%;
         padding: 10px 15px;
         border-radius: 18px;
         box-shadow: var(--secondary-shadow);
         word-wrap: break-word;
-        /* Remove any fixed width */
     }
 
     .message-content.sent {
@@ -134,25 +145,22 @@
         margin-top: 4px;
     }
 
-    .message-item.sent .message-timestamp {
-        align-self: flex-end;
-    }
-
-    .message-item.received .message-timestamp {
-        align-self: flex-start;
-    }
-
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     #messageInputContainer {
+        position: fixed;
+        bottom: calc(60px + env(safe-area-inset-bottom)); /* Above the bottom nav */
+        left: 0;
+        right: 0;
         display: flex;
         align-items: center;
         padding: 10px;
         background-color: var(--secondary-bg-color);
         box-shadow: var(--primary-shadow);
+        z-index: 950; /* Above the chat */
     }
 
     #messageInput {
@@ -170,13 +178,13 @@
         align-items: center;
         justify-content: center;
         width: 44px;
-        height: 44px; /* Match the height of the input */
+        height: 44px;
         border-radius: var(--border-radius);
         background-color: #007bff;
         color: #ffffff;
         border: none;
         transition: background-color 0.3s ease;
-        padding: 0; /* Remove padding */
+        padding: 0;
     }
 
     #sendButton:hover {
@@ -186,11 +194,6 @@
     #sendButton svg {
         width: 24px;
         height: 24px;
-    }
-
-    /* Message template */
-    #message-template {
-        display: none;
     }
 
     /* Channel List Offcanvas */
@@ -208,35 +211,28 @@
         background-color: #f8f9fa;
     }
 
-    /* Responsive adjustments */
-    @media (min-width: 768px) {
-        #chat-area {
-            height: calc(100vh - 80px);
-        }
+    /* Adjust body overflow when channel is open */
+    body.channel-open {
+        overflow: hidden;
     }
 </style>
 
-<div class="container-fluid">
-    <main role="main">
-        <!-- Chat Area -->
-        <section id="chat-area">
-            <!-- Message List -->
-            <div id="messageList">
-                <!-- Messages will be dynamically inserted here -->
-            </div>
+<!-- Chat Interface -->
+<div id="chat-container">
+    <div id="messageList">
+        <!-- Messages will be dynamically inserted here -->
+    </div>
+</div>
 
-            <!-- Message Input -->
-            <div id="messageInputContainer">
-                <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" />
-                <button id="sendButton">
-                    <!-- Inline SVG Icon for Send Button -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
-                        <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
-                    </svg>
-                </button>
-            </div>
-        </section>
-    </main>
+<!-- Message Input -->
+<div id="messageInputContainer">
+    <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off" />
+    <button id="sendButton">
+        <!-- Inline SVG Icon for Send Button -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+            <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/>
+        </svg>
+    </button>
 </div>
 
 <!-- Bottom Navigation Bar -->

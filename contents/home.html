@@ -1,32 +1,83 @@
 <!-- home.html -->
 <style>
     :root {
-        --primary-bg-color: #f8f9fa;
+        --primary-bg-color: #ffffff;
         --secondary-bg-color: #ffffff;
         --primary-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         --secondary-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         --border-radius: 15px;
         --btn-padding: 0.375rem 1rem;
         --font-family: 'Noto Sans KR', sans-serif;
+        --header-height: 120px; /* 필터/정렬 섹션의 높이 */
+        --bottom-nav-height: 80px; /* 하단 내비게이션 바의 높이 */
     }
 
     body {
         font-family: var(--font-family);
         background-color: var(--primary-bg-color);
-        margin-bottom: calc(80px + env(safe-area-inset-bottom)); /* Reserve space for bottom navbar */
+        margin: 0; /* 기본 마진 제거 */
+        /* padding-top과 padding-bottom 제거 */
+    }
+
+    /* 필터/정렬 섹션 스타일 */
+    #filter-sort-section {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--header-height);
+        background-color: var(--secondary-bg-color);
+        z-index: 1000;
+        box-shadow: var(--primary-shadow);
+        padding: 15px 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* 글씨 크기 및 스타일 조정 */
+    #filter-sort-section .form-select {
+        font-size: 14px;
+        padding: 0.5rem 0.75rem;
+        width: 100%;
+        height: 40px;
+    }
+
+    /* 컬럼 간 간격 조정 */
+    #filter-sort-section .row {
+        margin-right: -5px;
+        margin-left: -5px;
+        height: auto; /* 높이를 자동으로 조정 */
+        align-items: center;
+    }
+
+    #filter-sort-section .col {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding-right: 5px;
+        padding-left: 5px;
+        margin-bottom: 10px; /* 각 열 사이에 약간의 여백 추가 */
+    }
+
+    #home-page-content {
+        padding-top: calc(var(--header-height) + 10px); /* 헤더 높이 + 추가 여백 */
+        padding-bottom: var(--bottom-nav-height);
+        overflow-y: auto;
+        height: 100vh;
+        box-sizing: border-box;
     }
 
     .container-fluid {
         max-width: 1200px;
     }
 
-    /* Touch-friendly button sizes */
+    /* 터치 친화적인 버튼 크기 */
     .btn {
         min-width: 44px;
         min-height: 44px;
     }
 
-    /* Bottom Navigation Bar */
+    /* 하단 내비게이션 바 고정 */
     .bottom-nav {
         position: fixed;
         bottom: 0;
@@ -38,8 +89,8 @@
         justify-content: space-around;
         align-items: center;
         z-index: 1000;
-        padding-top: 10px; /* Add top padding for better centering */
-        padding-bottom: env(safe-area-inset-bottom); /* Account for safe area */
+        padding-top: 10px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
 
     .bottom-nav .nav-item {
@@ -55,15 +106,15 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 0; /* Reset padding */
-        padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* Push content above home bar */
+        padding: 0; /* 패딩 초기화 */
+        padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* 홈 바 위로 컨텐츠 밀기 */
         width: 100%;
     }
 
     .bottom-nav .nav-link .bi,
     .bottom-nav .navbar-toggler .bi {
         font-size: 24px;
-        margin-bottom: 4px;
+        margin-bottom: 0px;
     }
 
     .navbar-toggler {
@@ -74,15 +125,6 @@
     .navbar-toggler:focus {
         outline: none;
         box-shadow: none;
-    }
-
-    /* Content styles */
-    .filter-sort-controls {
-        background-color: var(--secondary-bg-color);
-        border-radius: var(--border-radius);
-        box-shadow: var(--primary-shadow);
-        padding: 20px;
-        margin-bottom: 20px;
     }
 
     .order-card {
@@ -101,74 +143,75 @@
 
     @supports (padding-bottom: env(safe-area-inset-bottom)) {
         .bottom-nav {
-            height: auto; /* Let the height adjust automatically */
+            height: auto; /* 높이를 자동으로 조정 */
         }
     }
 
-    /* Responsive adjustments */
+    /* 반응형 조정 */
     @media (min-width: 768px) {
-        /* Adjust content layout for larger screens */
+        /* 큰 화면에서의 콘텐츠 레이아웃 조정 */
         .order-card {
             margin-bottom: 2rem;
         }
     }
 </style>
 
-<div class="container-fluid">
-    <main role="main">
-
-        <!-- Filter and Sort Section -->
-        <section id="filter-sort-section" class="filter-sort-controls mb-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-6 col-md-3">
-                    <label for="region-filter" class="form-label">지역</label>
-                    <select id="region-filter" class="form-select">
-                        <option value="">전체</option>
-                        <!-- Regions will be populated dynamically -->
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="city-filter" class="form-label">도시</label>
-                    <select id="city-filter" class="form-select">
-                        <option value="">전체</option>
-                        <!-- Cities will be populated dynamically -->
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="status-filter" class="form-label">상태</label>
-                    <select id="status-filter" class="form-select">
-                        <option value="">전체</option>
-                        <option value="open">지원가능</option>
-                        <option value="closed">마감</option>
-                    </select>
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="sort-option" class="form-label">정렬</label>
-                    <select id="sort-option" class="form-select">
-                        <option value="created_at">최신순</option>
-                        <option value="fee">수수료순</option>
-                    </select>
-                </div>
+<!-- 필터와 정렬 섹션 -->
+<div id="filter-sort-section">
+    <div class="container-fluid">
+        <div class="row g-2">
+            <!-- 지역 필터 -->
+            <div class="col-6 col-md-3">
+                <select id="region-filter" class="form-select">
+                    <option value="">지역 선택</option>
+                    <!-- 옵션들은 동적으로 채워집니다 -->
+                </select>
             </div>
-        </section>
+            <!-- 도시 필터 -->
+            <div class="col-6 col-md-3">
+                <select id="city-filter" class="form-select">
+                    <option value="">도시 선택</option>
+                    <!-- 옵션들은 동적으로 채워집니다 -->
+                </select>
+            </div>
+            <!-- 상태 필터 -->
+            <div class="col-6 col-md-3">
+                <select id="status-filter" class="form-select">
+                    <option value="">상태 선택</option>
+                    <option value="open">지원가능</option>
+                    <option value="closed">마감</option>
+                </select>
+            </div>
+            <!-- 정렬 옵션 -->
+            <div class="col-6 col-md-3">
+                <select id="sort-option" class="form-select">
+                    <option value="created_at">최신순</option>
+                    <option value="fee">수수료순</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
 
-        <!-- Order Dashboard -->
+<div class="container-fluid" id="home-page-content">
+    <main role="main">
+        <!-- 오더 대시보드 -->
         <section id="order-dashboard" class="mb-4">
             <div id="order-posts-container" class="row g-4">
-                <!-- Order posts will be dynamically inserted here -->
+                <!-- 오더 게시물이 여기에 동적으로 삽입됩니다 -->
             </div>
         </section>
 
-        <!-- Pagination -->
+        <!-- 페이지네이션 -->
         <nav aria-label="Page navigation">
             <ul id="pagination-container" class="pagination justify-content-center">
-                <!-- Pagination will be dynamically inserted here -->
+                <!-- 페이지네이션이 여기에 동적으로 삽입됩니다 -->
             </ul>
         </nav>
     </main>
 </div>
 
-<!-- Bottom Navigation Bar -->
+<!-- 하단 내비게이션 바 -->
 <nav class="navbar navbar-expand navbar-light bottom-nav">
     <div class="container-fluid">
         <ul class="navbar-nav w-100">
@@ -200,7 +243,7 @@
     </div>
 </nav>
 
-<!-- Offcanvas Menu -->
+<!-- 오프캔버스 메뉴 -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title">메뉴</h5>
@@ -217,16 +260,14 @@
             <li class="nav-item">
                 <a class="nav-link" href="#my-applications">내 지원서</a>
             </li>
-            <!--
             <li class="nav-item">
                 <a class="nav-link" href="#logout">로그아웃</a>
             </li>
-            -->
         </ul>
     </div>
 </div>
 
-<!-- Order Card Template -->
+<!-- 오더 카드 템플릿 -->
 <template id="order-card-template">
     <div class="col-12">
         <div class="card order-card h-100 shadow-sm" style="cursor: pointer;">
@@ -248,7 +289,7 @@
     </div>
 </template>
 
-<!-- Order Details Modal -->
+<!-- 오더 상세 모달 -->
 <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -257,7 +298,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="orderDetailsModalBody">
-                <!-- Order details will be dynamically inserted here -->
+                <!-- 오더 상세 정보가 여기에 동적으로 삽입됩니다 -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>

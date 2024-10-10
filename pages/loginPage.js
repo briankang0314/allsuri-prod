@@ -29,21 +29,21 @@ export async function SetupLoginPage() {
         backButton.addEventListener('click', async () => await FillTheBody('home'));
     }
 
-    // const emailLoginForm = document.getElementById('email-login-form');
-    // emailLoginForm.addEventListener('submit', async (e) => {
-    //     e.preventDefault();
-    //     const email = document.getElementById('email').value;
-    //     const password = document.getElementById('password').value;
-    //     try {
-    //         const user = await loginWithEmail(email, password);
-    //         if (user) {
-    //             // Handle successful login (e.g., store user info, redirect)
-    //             await FillTheBody('home');
-    //         }
-    //     } catch (error) {
-    //         console.error('Login error:', error);
-    //     }
-    // });
+    const emailLoginForm = document.getElementById('email-login-form');
+    emailLoginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        try {
+            const user = await loginWithEmail(email, password);
+            if (user) {
+                // Handle successful login (e.g., store user info, redirect)
+                await FillTheBody('home');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+        }
+    });
 
     // const signupLink = document.getElementById('signup-link');
     // signupLink.addEventListener('click', (e) => {

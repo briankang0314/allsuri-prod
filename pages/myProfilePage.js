@@ -2,8 +2,6 @@ import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage } from '../utils/helpers.js';
 
-
-
 export async function SetupMyProfilePage() {
     try {
         console.log("Starting SetupMyProfilePage");
@@ -44,22 +42,85 @@ export async function FetchUserProfile() {
 }
 
 function SetupMyProfileEventListeners() {
-    const logoLink = document.getElementById('logo-link');
-    if (logoLink) {
-        logoLink.addEventListener('click', async (e) => {
+    // Bottom navigation buttons
+    const homeBtn = document.getElementById('home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             await FillTheBody('home');
         });
     }
 
-    const backBtn = document.getElementById('back-btn');
-    if (backBtn) {
-        backBtn.addEventListener('click', async () => await FillTheBody('home'));
+    const postOrderBtn = document.getElementById('post-order-btn');
+    if (postOrderBtn) {
+        postOrderBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await FillTheBody('post-order');
+        });
     }
 
+    const chatBtn = document.getElementById('chat-btn');
+    if (chatBtn) {
+        chatBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await FillTheBody('chat');
+        });
+    }
+
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = document.getElementById('offcanvasMenu');
+            const bsOffcanvas = new bootstrap.Offcanvas(offcanvasMenu);
+            bsOffcanvas.toggle();
+        });
+    }
+
+    // Offcanvas menu links
+    const profileLink = document.querySelector('.offcanvas-body .nav-link[href="#profile"]');
+    if (profileLink) {
+        profileLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const offcanvasMenu = document.getElementById('offcanvasMenu');
+            const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasMenu);
+            bsOffcanvas.hide();
+            await FillTheBody('my-profile');
+        });
+    }
+
+    const myOrdersLink = document.querySelector('.offcanvas-body .nav-link[href="#my-orders"]');
+    if (myOrdersLink) {
+        myOrdersLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const offcanvasMenu = document.getElementById('offcanvasMenu');
+            const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasMenu);
+            bsOffcanvas.hide();
+            await FillTheBody('my-orders');
+        });
+    }
+
+    const myApplicationsLink = document.querySelector('.offcanvas-body .nav-link[href="#my-applications"]');
+    if (myApplicationsLink) {
+        myApplicationsLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const offcanvasMenu = document.getElementById('offcanvasMenu');
+            const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasMenu);
+            bsOffcanvas.hide();
+            await FillTheBody('my-applications');
+        });
+    }
+
+    // Edit profile button
     const editProfileBtn = document.getElementById('edit-profile-btn');
     if (editProfileBtn) {
         editProfileBtn.addEventListener('click', async () => await FillTheBody('edit-profile'));
+    }
+
+    // Complete profile button in warning
+    const completeProfileBtn = document.getElementById('complete-profile-btn');
+    if (completeProfileBtn) {
+        completeProfileBtn.addEventListener('click', async () => await FillTheBody('edit-profile'));
     }
 
     InitializeAnimations();
@@ -72,15 +133,15 @@ function CalculateProfileCompletion(profile) {
 }
 
 function UpdateProfileUI(profile) {
-    // profile image
-    document.getElementById('profile-image').src = profile.profile_image_url ?? '/contents/_icon.png';
+    // Profile image
+    document.getElementById('profile-image').src = profile.profile_image_url ?? '/contents/default-profile.png';
 
     const profileContainer = document.getElementById('profile-container');
     if (profileContainer) {
         profileContainer.classList.add('show');
     }
     
-    // user info
+    // User info
     document.getElementById('user-nickname').textContent = profile.nickname ?? '정보 없음';
     document.getElementById('user-email').textContent = profile.email ?? '정보 없음';
 
@@ -88,8 +149,10 @@ function UpdateProfileUI(profile) {
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ko-KR');
     document.getElementById('created-at').textContent = profile.created_at ? formatDate(profile.created_at) : '알 수 없음';
 
-    // New fields
+    // Account type
     document.getElementById('account-type').textContent = profile.account_type ?? '일반 사용자';
+
+    // Phone and location
     document.getElementById('user-phone').textContent = profile.phone ?? '정보 없음';
     document.getElementById('user-location').textContent = `${profile.region || ''} ${profile.city || ''}`.trim() || '정보 없음';
 
@@ -100,23 +163,6 @@ function UpdateProfileUI(profile) {
     // Rating and orders
     document.getElementById('user-rating').textContent = profile.average_rating ? `${profile.average_rating.toFixed(1)}/5.0` : '아직 평가 없음';
     document.getElementById('completed-orders').textContent = profile.completed_orders ?? '0';
-
-    // Account statistics
-    const statItems = [
-        { id: 'total-orders', value: profile.total_orders ?? '0' },
-        { id: 'completed-orders-count', value: profile.completed_orders ?? '0' },
-        { id: 'cancellation-rate', value: profile.cancellation_rate?.toFixed(1) ?? '0.0' }
-    ];
-
-    statItems.forEach((item, index) => {
-        const element = document.getElementById(item.id);
-        if (element) {
-            setTimeout(() => {
-                element.textContent = item.value;
-                element.style.opacity = 1;
-            }, 100 * index);
-        }
-    });
 
     // Preferred categories
     UpdatePreferredCategories(profile.preferred_categories);
@@ -133,6 +179,12 @@ function UpdateProfileCompletionBar(percentage) {
         completionBar.style.width = `${percentage}%`;
         completionBar.setAttribute('aria-valuenow', percentage);
         completionBar.textContent = `${percentage}%`;
+
+        // Show warning if profile is incomplete
+        const warningElement = document.getElementById('incomplete-profile-warning');
+        if (warningElement) {
+            warningElement.classList.remove('d-none');
+        }
     }
 }
 
@@ -145,18 +197,6 @@ function UpdatePreferredCategories(categories) {
         badge.textContent = category;
         categoriesContainer.appendChild(badge);
     });
-}
-
-export function ShowIncompleteProfileWarning() {
-    const warningElement = document.getElementById('incomplete-profile-warning');
-    if (warningElement) {
-        warningElement.style.display = 'block';
-    }
-
-    const completeProfileBtn = document.getElementById('complete-profile-btn');
-    if (completeProfileBtn) {
-        completeProfileBtn.addEventListener('click', async () => await FillTheBody('edit-profile'));
-    }
 }
 
 function InitializeAnimations() {

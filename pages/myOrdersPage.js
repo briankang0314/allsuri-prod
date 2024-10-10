@@ -1,9 +1,9 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
-import { currentOrderId, postsPerPage, UpdatePagination, PopulateRegionFilter, PopulateCityFilter } from './homePage.js';
-
-
+import { postsPerPage, UpdatePagination, PopulateRegionFilter, PopulateCityFilter } from './homePage.js';
+import { Logout } from '../auth/auth.js';
+import { ShowLoadingSpinner, HideLoadingSpinner } from '../utils/loadingSpinner.js';
 
 let myOrdersCurrentFilters = {
     region: '',
@@ -13,10 +13,103 @@ let myOrdersCurrentFilters = {
 
 let myOrdersCurrentSort = 'created_at';
 
+let currentPage = 1;
 
+export async function SetupMyOrdersPage() {
+    console.log('Setting up My Orders page');
 
-export async function FetchAndDisplayMyOrderPosts(page = 1) {
+    SetupMyOrdersEventListeners();
+    SetupMyOrdersFilterAndSort();
+
+    await FetchAndDisplayMyOrderPosts(1);
+
+    console.log('My Orders page setup complete');
+}
+
+function SetupMyOrdersEventListeners() {
+    // Home button
+    const homeBtn = document.getElementById('home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', async () => await FillTheBody('home'));
+    }
+
+    // New Order button
+    const newOrderBtn = document.getElementById('new-order-btn');
+    if (newOrderBtn) {
+        newOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
+    }
+
+    // Refresh button
+    const refreshBtn = document.getElementById('refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', RefreshMyOrderPosts);
+    }
+
+    // Menu button
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        menuBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const offcanvasMenu = new bootstrap.Offcanvas(document.getElementById('offcanvasMenu'));
+            offcanvasMenu.show();
+        });
+    }
+
+    // Offcanvas menu items
+    const menuItems = document.querySelectorAll('#offcanvasMenu .nav-link');
+    menuItems.forEach(item => {
+        item.addEventListener('click', HandleMenuItemClick);
+    });
+
+    // Pagination
+    const paginationContainer = document.getElementById('pagination-container');
+    if (paginationContainer) {
+        paginationContainer.addEventListener('click', async (e) => {
+            if (e.target.tagName === 'A' && e.target.getAttribute('data-page')) {
+                e.preventDefault();
+                const page = parseInt(e.target.getAttribute('data-page'));
+                await FetchAndDisplayMyOrderPosts(page);
+            }
+        });
+    }
+
+    SetupMyOrdersPullToRefresh();
+}
+
+function SetupMyOrdersFilterAndSort() {
+    const regionFilter = document.getElementById('region-filter');
+    const cityFilter = document.getElementById('city-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const sortOption = document.getElementById('sort-option');
+
+    PopulateRegionFilter(regionFilter);
+
+    regionFilter.addEventListener('change', async (e) => {
+        myOrdersCurrentFilters.region = e.target.value;
+        myOrdersCurrentFilters.city = '';
+        PopulateCityFilter(cityFilter, e.target.value);
+        await FetchAndDisplayMyOrderPosts(1);
+    });
+
+    cityFilter.addEventListener('change', async (e) => {
+        myOrdersCurrentFilters.city = e.target.value;
+        await FetchAndDisplayMyOrderPosts(1);
+    });
+
+    statusFilter.addEventListener('change', async (e) => {
+        myOrdersCurrentFilters.status = e.target.value;
+        await FetchAndDisplayMyOrderPosts(1);
+    });
+
+    sortOption.addEventListener('change', async (e) => {
+        myOrdersCurrentSort = e.target.value;
+        await FetchAndDisplayMyOrderPosts(1);
+    });
+}
+
+async function FetchAndDisplayMyOrderPosts(page = 1) {
     try {
+        ShowLoadingSpinner();
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/GetOrders', {
             method: 'POST',
             headers: {
@@ -46,62 +139,8 @@ export async function FetchAndDisplayMyOrderPosts(page = 1) {
     } catch (error) {
         console.error('Error fetching my orders:', error);
         ShowErrorMessage('내 오더를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
-}
-
-export async function SetupMyOrdersPage() {
-	myOrdersCurrentFilters = {
-		region: '',
-		city: '',
-		status: ''
-	};
-	myOrdersCurrentSort = 'created_at';
-
-	const regionFilter = document.getElementById('region-filter');
-	const cityFilter = document.getElementById('city-filter');
-	const statusFilter = document.getElementById('status-filter');
-	const sortOption = document.getElementById('sort-option');
-
-	if (regionFilter) regionFilter.value = '';
-	if (cityFilter) cityFilter.value = '';
-	if (statusFilter) statusFilter.value = '';
-	if (sortOption) sortOption.value = 'created_at';
-	
-    const logoLink = document.getElementById('logo-link');
-    if (logoLink) {
-        logoLink.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await FillTheBody('home');
-        });
-    }
-
-    const backBtn = document.getElementById('back-btn');
-    if (backBtn) {
-        backBtn.addEventListener('click', async () => await FillTheBody('home'));
-    }
-
-    const newOrderBtn = document.getElementById('new-order-btn');
-    if (newOrderBtn) {
-        newOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
-    }
-
-    const refreshBtn = document.getElementById('refresh-btn');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', RefreshMyOrderPosts);
-    }
-
-    SetupMyOrdersFilterAndSort();
-    await FetchAndDisplayMyOrderPosts(1);
-
-    const paginationContainer = document.getElementById('pagination-container');
-    if (paginationContainer) {
-        paginationContainer.addEventListener('click', async (e) => {
-            if (e.target.tagName === 'A' && e.target.getAttribute('data-page')) {
-                e.preventDefault();
-                const page = parseInt(e.target.getAttribute('data-page'));
-                await FetchAndDisplayMyOrderPosts(page);
-            }
-        });
+    } finally {
+        HideLoadingSpinner();
     }
 }
 
@@ -174,7 +213,6 @@ function DisplayMyOrderPosts(myOrders) {
                 cardElement.setAttribute('data-order-id', order.order_id);
             }
 
-
             container.appendChild(orderCard);
         } catch (error) {
             console.error('Error populating order card:', error);
@@ -183,9 +221,9 @@ function DisplayMyOrderPosts(myOrders) {
 }
 
 async function RefreshMyOrderPosts() {
-    
+    console.log('Refreshing My Orders');
     try {
-        await FetchAndDisplayMyOrderPosts(1); // Fetch the first page of my posts
+        await FetchAndDisplayMyOrderPosts(1);
         ShowSuccessMessage('내 오더 목록이 새로고침되었습니다.', 3000);
     } catch (error) {
         console.error('Error refreshing my order posts:', error);
@@ -193,40 +231,8 @@ async function RefreshMyOrderPosts() {
     }
 }
 
-function SetupMyOrdersFilterAndSort() {
-    const regionFilter = document.getElementById('region-filter');
-    const cityFilter = document.getElementById('city-filter');
-    const statusFilter = document.getElementById('status-filter');
-    const sortOption = document.getElementById('sort-option');
-
-    PopulateRegionFilter(regionFilter);
-
-    regionFilter.addEventListener('change', async (e) => {
-        myOrdersCurrentFilters.region = e.target.value;
-        myOrdersCurrentFilters.city = '';
-        PopulateCityFilter(cityFilter, e.target.value);
-        await FetchAndDisplayMyOrderPosts(1);
-    });
-
-    cityFilter.addEventListener('change', async (e) => {
-        myOrdersCurrentFilters.city = e.target.value;
-        await FetchAndDisplayMyOrderPosts(1);
-    });
-
-    statusFilter.addEventListener('change', async (e) => {
-        myOrdersCurrentFilters.status = e.target.value;
-        await FetchAndDisplayMyOrderPosts(1);
-    });
-
-    sortOption.addEventListener('change', async (e) => {
-        myOrdersCurrentSort = e.target.value;
-        await FetchAndDisplayMyOrderPosts(1);
-    });
-}
-
 function ShowMyOrderDetails(order) {
     console.log('ShowMyOrderDetails called with order:', order);
-    currentOrderId = order.order_id;
     const modalTitle = document.getElementById('orderDetailsModalLabel');
     const modalBody = document.getElementById('orderDetailsModalBody');
 
@@ -260,28 +266,17 @@ function ShowMyOrderDetails(order) {
 
     const viewApplicationsBtn = document.getElementById('btn-view-applications');
     if (viewApplicationsBtn) {
-        console.log('Setting up viewApplicationsBtn click handler');
         viewApplicationsBtn.onclick = async () => {
-            console.log('viewApplicationsBtn clicked');
-            // Close the current modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('orderDetailsModal'));
             if (modal) {
-                console.log('Closing orderDetailsModal');
                 modal.hide();
-            } else {
-                console.error('orderDetailsModal instance not found');
             }
-            // Navigate to the new applications page
-            console.log('Attempting to navigate to order-applications page');
             await FillTheBody('order-applications', { order: order });
         };
-    } else {
-        console.error('viewApplicationsBtn not found');
     }
 
     const modal = new bootstrap.Modal(document.getElementById('orderDetailsModal'));
     modal.show();
-    console.log('orderDetailsModal shown');
 }
 
 function EditOrder(orderId) {
@@ -319,7 +314,79 @@ async function DeleteOrder(orderId) {
     } catch (error) {
         console.error('Error deleting order:', error);
         ShowErrorMessage(error.message || '오더 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-        
+    }
+}
+
+function SetupMyOrdersPullToRefresh() {
+    let isRefreshing = false;
+    let startY = 0;
+    const refreshThreshold = 40;
+
+    const contentContainer = document.getElementById('my-orders-page-content');
+
+    contentContainer.addEventListener('touchstart', (e) => {
+        if (window.scrollY <= 10) {
+            startY = e.touches[0].pageY;
+        }
+    });
+
+    contentContainer.addEventListener('touchmove', (e) => {
+        if (!isRefreshing && startY > 0) {
+            const currentY = e.touches[0].pageY;
+            const pullDistance = currentY - startY;
+
+            if (pullDistance > refreshThreshold && window.scrollY <= 10) {
+                isRefreshing = true;
+                TriggerMyOrdersRefresh();
+            }
+        }
+    });
+
+    contentContainer.addEventListener('touchend', () => {
+        startY = 0;
+        isRefreshing = false;
+    });
+}
+
+async function TriggerMyOrdersRefresh() {
+    console.log('Pull-to-refresh: Starting refresh on My Orders');
+    try {
+        await FetchAndDisplayMyOrderPosts(1);
+        ShowSuccessMessage('내 오더 목록이 새로고침되었습니다.', 3000);
+    } catch (error) {
+        console.error('Error refreshing my orders:', error);
+        ShowErrorMessage('내 오더 목록 새로고침 중 오류가 발생했습니다. 다시 시도해주세요.');
+    }
+}
+
+function HandleMenuItemClick(e) {
+    e.preventDefault();
+    const href = e.target.getAttribute('href');
+
+    // Close the offcanvas menu
+    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+    if (offcanvasMenu) {
+        offcanvasMenu.hide();
+    }
+
+    // Handle the click action
+    try {
+        switch (href) {
+            case '#profile':
+                FillTheBody('my-profile');
+                break;
+            case '#my-orders':
+                FillTheBody('my-orders');
+                break;
+            case '#my-applications':
+                FillTheBody('my-applications');
+                break;
+            case '#logout':
+                Logout();
+                break;
+        }
+    } catch (error) {
+        console.error('Error handling menu item click:', error);
+        ShowErrorMessage('오류가 발생했습니다. 다시 시도해주세요.');
     }
 }

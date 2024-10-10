@@ -1,9 +1,12 @@
+// homePage.js
+
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { InitializeApplicationForm } from './applyForOrderPage.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
 import { cities, regions } from '../utils/constants.js';
 import { Logout } from '../auth/auth.js';
+import { ShowLoadingSpinner, HideLoadingSpinner } from '../utils/loadingSpinner.js';
 
 
 
@@ -34,10 +37,10 @@ export async function SetupHomePage() {
 }
 
 function SetupHomePageEventListeners() {
-    // Logo
-    const logoLink = document.getElementById('logo-link');
-    if (logoLink) {
-        logoLink.addEventListener('click', async (e) => {
+    // Home button
+    const homeBtn = document.getElementById('home-btn');
+    if (homeBtn) {
+        homeBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             await FillTheBody('home');
         });
@@ -275,21 +278,24 @@ function SetupFilterAndSort() {
 function SetupPullToRefresh() {
     let isRefreshing = false;
     let startY = 0;
-    let currentY = 0;
-    let refreshThreshold = 60; // Threshold in pixels to trigger refresh
+    const refreshThreshold = 40; // Reduced threshold for a more generous trigger
 
-    const contentContainer = document.querySelector('body');
+    const contentContainer = document.getElementById('home-page-content');
 
     contentContainer.addEventListener('touchstart', (e) => {
-        if (window.scrollY === 0) {
+        // Allow pull-to-refresh when scrolled near the top
+        if (window.scrollY <= 10) {
             startY = e.touches[0].pageY;
         }
     });
 
     contentContainer.addEventListener('touchmove', (e) => {
-        if (window.scrollY === 0) {
-            currentY = e.touches[0].pageY;
-            if (currentY - startY > refreshThreshold && !isRefreshing) {
+        if (!isRefreshing && startY > 0) {
+            const currentY = e.touches[0].pageY;
+            const pullDistance = currentY - startY;
+
+            // Trigger refresh if pull distance exceeds threshold
+            if (pullDistance > refreshThreshold && window.scrollY <= 10) {
                 isRefreshing = true;
                 TriggerRefresh();
             }
@@ -297,16 +303,18 @@ function SetupPullToRefresh() {
     });
 
     contentContainer.addEventListener('touchend', () => {
+        // Reset state variables on touch end
         startY = 0;
-        currentY = 0;
         isRefreshing = false;
     });
 }
 
 async function TriggerRefresh() {
+    console.log('Pull-to-refresh: Starting refresh');
     try {
         await FetchAndDisplayOrderPosts(1);
         ShowSuccessMessage('오더 목록이 새로고침되었습니다.', 3000);
+        console.log('Pull-to-refresh: Refresh completed successfully');
     } catch (error) {
         console.error('Error refreshing order posts:', error);
         ShowErrorMessage('오더 목록 새로고침 중 오류가 발생했습니다. 다시 시도해주세요.');

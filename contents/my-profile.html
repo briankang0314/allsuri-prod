@@ -1,7 +1,7 @@
 <!-- my-profile.html -->
 <style>
     :root {
-        --primary-bg-color: #f8f9fa;
+        --primary-bg-color: #ffffff;
         --secondary-bg-color: #ffffff;
         --primary-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         --secondary-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -13,64 +13,76 @@
     body {
         font-family: var(--font-family);
         background-color: var(--primary-bg-color);
-        margin: 0;
-        padding: 0;
+        margin-bottom: calc(80px + env(safe-area-inset-bottom)); /* Reserve space for bottom navbar */
     }
 
     .container-fluid {
         max-width: 1200px;
     }
 
-    /* Header styles consistent with other pages */
-    .header {
-        background-color: var(--secondary-bg-color);
-        border-radius: var(--border-radius);
-        box-shadow: var(--primary-shadow);
-        padding: 15px 20px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        transition: transform 0.3s ease;
-        margin-right: 10px;
-    }
-
-    .logo:hover {
-        transform: scale(1.1);
-    }
-
+    /* Touch-friendly button sizes */
     .btn {
-        border-radius: 20px;
-        padding: var(--btn-padding);
-        transition: all 0.3s ease;
+        min-width: 44px;
+        min-height: 44px;
     }
 
-    .btn:hover {
-        transform: translateY(-2px);
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--secondary-bg-color);
+        box-shadow: var(--primary-shadow);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        padding-top: 10px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
 
-    .btn-back {
-        background-color: #f8f9fa;
-        color: #000000;
-        border: 1px solid #ced4da;
+    .bottom-nav .nav-item {
+        flex: 1;
+        text-align: center;
     }
 
-    .btn-back:hover {
-        background-color: #e9ecef;
+    .bottom-nav .nav-link,
+    .bottom-nav .navbar-toggler {
+        color: #000;
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        width: 100%;
     }
 
+    .bottom-nav .nav-link .bi,
+    .bottom-nav .navbar-toggler .bi {
+        font-size: 24px;
+        margin-bottom: 0px;
+    }
+
+    .navbar-toggler {
+        border: none;
+        background: transparent;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    /* Content styles */
     .content {
         background-color: var(--secondary-bg-color);
         border-radius: var(--border-radius);
         box-shadow: var(--primary-shadow);
         padding: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 80px;
     }
 
     .profile-image {
@@ -152,147 +164,137 @@
         border-color: #d39e00;
     }
 
+    /* Responsive adjustments */
     @media (max-width: 768px) {
-        .header {
-            padding: 15px;
-        }
-
-        .header h1 {
-            font-size: 1.75rem;
-        }
-
-        .logo {
-            width: 35px;
-            height: 35px;
-            margin-right: 8px;
-        }
-
-        .btn {
-            font-size: 0.9rem;
-            padding: 0.3rem 0.8rem;
-        }
-
-        .content {
-            padding: 15px;
+        .stat-item {
+            padding: 0.75rem;
         }
     }
 
-    @media (max-width: 576px) {
-        .header {
-            padding: 10px 15px;
-        }
-
-        .header h1 {
-            font-size: 1.5rem;
-        }
-
-        .logo {
-            width: 30px;
-            height: 30px;
-            margin-right: 5px;
-        }
-
-        .btn {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.7rem;
-        }
-
-        .content {
-            padding: 10px;
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .bottom-nav {
+            height: auto;
         }
     }
 </style>
 
-<div class="container-fluid">
-    <header class="header">
-        <div class="d-flex align-items-center">
-            <a href="#" id="logo-link">
-                <img src="/favicon.ico" alt="올수리 로고" class="logo">
-            </a>
-            <h1 class="h3 fw-bold m-0">내 프로필</h1>
-        </div>
-        <button id="back-btn" class="btn btn-back">
-            <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">홈으로</span>
-        </button>
-    </header>
-
-    <div class="content">
-        <div id="incomplete-profile-warning" class="incomplete-profile-warning d-none">
-            <h4><i class="bi bi-exclamation-triangle-fill"></i> 프로필 완성 필요</h4>
-            <p>서비스를 이용하기 위해 프로필을 완성해 주세요. 전화번호, 지역, 선호 카테고리 정보가 필요합니다.</p>
-            <button id="complete-profile-btn" class="btn">
-                <i class="bi bi-pencil-fill"></i> 지금 프로필 완성하기
-            </button>
-        </div>
-
-        <div id="profile-container" class="text-center">
-            <img id="profile-image" src="/contents/default-profile.png" alt="프로필 이미지" class="profile-image mb-3">
-            <h2 id="user-nickname" class="h4 mb-0">이름</h2>
-            <p id="user-email" class="text-muted">user@example.com</p>
-            <p><span id="account-type" class="badge bg-primary">일반 사용자</span></p>
-
-            <hr>
-
-            <div class="row text-start">
-                <div class="col-md-6">
-                    <p><i class="bi bi-calendar-event stat-icon"></i> <strong>가입일:</strong> <span id="created-at">알 수 없음</span></p>
-                </div>
-                <div class="col-md-6">
-                    <p><i class="bi bi-telephone stat-icon"></i> <strong>연락처:</strong> <span id="user-phone">정보 없음</span></p>
-                    <p><i class="bi bi-geo-alt stat-icon"></i> <strong>지역:</strong> <span id="user-location">정보 없음</span></p>
-                </div>
-            </div>
-
-            <div id="profile-completion-section" class="mb-4">
-                <h3 class="h5 section-title">프로필 완성도</h3>
-                <div class="progress">
-                    <div id="profile-completion" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="stat-item">
-                        <p class="mb-0"><i class="bi bi-star-fill stat-icon"></i> <strong>평균 평점:</strong> <span id="user-rating">아직 평가 없음</span></p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="stat-item">
-                        <p class="mb-0"><i class="bi bi-patch-check-fill stat-icon"></i> <strong>완료된 오더:</strong> <span id="completed-orders">0</span></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="stat-item">
-                        <p class="mb-0"><i class="bi bi-hammer stat-icon"></i> <strong>총 오더 수:</strong> <span id="total-orders">0</span></p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-item">
-                        <p class="mb-0"><i class="bi bi-check2-all stat-icon"></i> <strong>완료한 오더:</strong> <span id="completed-orders-count">0</span></p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-item">
-                        <p class="mb-0"><i class="bi bi-x-circle stat-icon"></i> <strong>취소율:</strong> <span id="cancellation-rate">0%</span></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <h3 class="h5 section-title">선호 카테고리</h3>
-                <div id="preferred-categories">
-                    <!-- Preferred categories badges will be inserted here -->
-                </div>
-            </div>
-
-            <div class="text-center">
-                <button id="edit-profile-btn" class="btn btn-edit-profile">
-                    <i class="bi bi-pencil-fill"></i> 프로필 수정
+<div class="container-fluid" id="my-profile-page-content">
+    <main role="main">
+        <div class="content">
+            <!-- Incomplete Profile Warning -->
+            <div id="incomplete-profile-warning" class="incomplete-profile-warning d-none">
+                <h4><i class="bi bi-exclamation-triangle-fill"></i> 프로필 완성 필요</h4>
+                <p>서비스를 이용하기 위해 프로필을 완성해 주세요. 전화번호, 지역, 선호 카테고리 정보가 필요합니다.</p>
+                <button id="complete-profile-btn" class="btn">
+                    <i class="bi bi-pencil-fill"></i> 지금 프로필 완성하기
                 </button>
             </div>
+
+            <!-- Profile Information -->
+            <div id="profile-container" class="text-center">
+                <img id="profile-image" src="/contents/default-profile.png" alt="프로필 이미지" class="profile-image mb-3">
+                <h2 id="user-nickname" class="h4 mb-0">이름</h2>
+                <p id="user-email" class="text-muted">user@example.com</p>
+                <p><span id="account-type" class="badge bg-primary">일반 사용자</span></p>
+
+                <hr>
+
+                <div class="row text-start">
+                    <div class="col-md-6">
+                        <p><i class="bi bi-calendar-event stat-icon"></i> <strong>가입일:</strong> <span id="created-at">알 수 없음</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><i class="bi bi-telephone stat-icon"></i> <strong>연락처:</strong> <span id="user-phone">정보 없음</span></p>
+                        <p><i class="bi bi-geo-alt stat-icon"></i> <strong>지역:</strong> <span id="user-location">정보 없음</span></p>
+                    </div>
+                </div>
+
+                <div id="profile-completion-section" class="mb-4">
+                    <h3 class="h5 section-title">프로필 완성도</h3>
+                    <div class="progress">
+                        <div id="profile-completion" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="stat-item">
+                            <p class="mb-0"><i class="bi bi-star-fill stat-icon"></i> <strong>평균 평점:</strong> <span id="user-rating">아직 평가 없음</span></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-item">
+                            <p class="mb-0"><i class="bi bi-patch-check-fill stat-icon"></i> <strong>완료된 오더:</strong> <span id="completed-orders">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h3 class="h5 section-title">선호 카테고리</h3>
+                    <div id="preferred-categories">
+                        <!-- Preferred categories badges will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button id="edit-profile-btn" class="btn btn-edit-profile">
+                        <i class="bi bi-pencil-fill"></i> 프로필 수정
+                    </button>
+                </div>
+            </div>
         </div>
+    </main>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<nav class="navbar navbar-expand navbar-light bottom-nav">
+    <div class="container-fluid">
+        <ul class="navbar-nav w-100">
+            <li class="nav-item">
+                <a href="#" id="home-btn" class="nav-link">
+                    <i class="bi bi-house-fill"></i>
+                    <span>홈</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="post-order-btn" class="nav-link">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>새 오더</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="chat-btn" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    <span>채팅</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" id="menu-btn" class="nav-link">
+                    <i class="bi bi-list"></i>
+                    <span>메뉴</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Offcanvas Menu -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">메뉴</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="#profile">내 프로필</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-orders">내 오더</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#my-applications">내 지원서</a>
+            </li>
+        </ul>
     </div>
 </div>
