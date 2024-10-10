@@ -3,6 +3,7 @@
 import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo, GetStatusClass, GetStatusText } from '../utils/helpers.js';
+import { ShowOverlay, HideOverlay } from '../utils/loadingSpinner.js';
 
 export let currentOrderId = null;
 
@@ -311,6 +312,8 @@ async function AcceptApplication(applicationId) {
         return;
     }
 
+    ShowOverlay();
+
     try {
         const acceptResponse = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/AcceptApplication', {
             method: 'POST',
@@ -346,6 +349,7 @@ async function AcceptApplication(applicationId) {
         await FetchAndDisplayApplications(currentOrderId);
     } catch (error) {
         console.error('Error accepting application:', error);
+        HideOverlay();
         ShowErrorMessage('지원서 수락 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
 }
@@ -354,6 +358,8 @@ async function RejectApplication(applicationId) {
     if (!confirm('이 지원서를 거절하시겠습니까?')) {
         return;
     }
+
+    ShowOverlay();
 
     try {
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/RejectApplication', {
@@ -389,6 +395,7 @@ async function RejectApplication(applicationId) {
     } catch (error) {
         console.error('Error rejecting application:', error);
         ShowErrorMessage('지원서 거절 중 오류가 발생했습니다. 다시 시도해주세요.');
+        HideOverlay();
     }
 }
 
@@ -448,4 +455,6 @@ function UpdateApplicationStatus(applicationId, status) {
     if (modal) {
         modal.hide();
     }
+
+    HideOverlay();
 }

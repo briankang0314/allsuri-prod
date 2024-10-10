@@ -3,6 +3,7 @@ import { MakeAuthenticatedRequest } from '../api/api.js';
 import { FetchUserProfile } from './myProfilePage.js';
 import { ShowErrorMessage, ShowSuccessMessage, PopulateRegions, PopulateCities } from '../utils/helpers.js';
 import { categories, regions } from '../utils/constants.js';
+import { ShowOverlay, HideOverlay } from '../utils/loadingSpinner.js';
 
 export async function SetupEditProfilePage() {
     try {
@@ -109,6 +110,8 @@ function PopulateEditProfileForm(profile) {
 }
 
 async function SaveProfileChanges() {
+    ShowOverlay();
+
     const updatedProfile = {
         nickname: document.getElementById('editNickname').value,
         phone: document.getElementById('editPhone').value,
@@ -149,6 +152,8 @@ async function SaveProfileChanges() {
     } catch (error) {
         console.error('Error updating profile:', error);
         ShowErrorMessage('프로필 업데이트에 실패했습니다. 다시 시도해 주세요.');
+    } finally {
+        HideOverlay();
     }
 }
 

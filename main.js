@@ -12,13 +12,13 @@ import { SetupApplyForOrderPage } from './pages/applyForOrderPage.js';
 import { SetupChatPage } from './pages/chatPage.js';
 import { SetupSignupPage } from './pages/signupPage.js';
 import { ShowErrorMessage } from './utils/helpers.js';
-import { ShowLoadingSpinner, HideLoadingSpinner } from './utils/loadingSpinner.js';
+import { ShowOverlay, HideOverlay } from './utils/loadingSpinner.js';
 
 
 
 export async function FillTheBody(contentName, params = {}) {
     try {
-        await ShowLoadingSpinner();
+        ShowOverlay();
 
         // Fetch and render the page content
         const response = await fetch(`/contents/${contentName}.html`);
@@ -82,10 +82,10 @@ export async function FillTheBody(contentName, params = {}) {
                 console.error(`Unknown content name: ${contentName}`);
         }
 
-        HideLoadingSpinner();
+        HideOverlay();
     } catch (error) {
         console.error(`Error loading ${contentName}:`, error);
-        HideLoadingSpinner();
+        HideOverlay();
         ShowErrorMessage(`${contentName} 페이지 로딩 중 오류가 발생했습니다. 다시 시도해주세요.`);
     }
 }

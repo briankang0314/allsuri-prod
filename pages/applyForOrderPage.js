@@ -6,6 +6,7 @@ import { ShowErrorMessage, ShowSuccessMessage } from '../utils/helpers.js';
 import { equipmentGroups } from '../utils/constants.js';
 import { ShowIncompleteProfileWarning } from './myProfilePage.js';
 import { CheckProfileCompleteness } from './editProfilePage.js';
+import { ShowOverlay, HideOverlay } from '../utils/loadingSpinner.js';
 
 function cleanupApplicationFormData() {
     localStorage.removeItem('applicationFormData');
@@ -652,7 +653,10 @@ function GenerateEquipmentCheckboxes() {
 }
 
 async function SubmitApplication() {
+    ShowOverlay();
+
     if (!await CheckProfileCompleteness()) {
+        HideOverlay();
         ShowErrorMessage('오더를 지원하려면 프로필을 완성해야 합니다.');
         await FillTheBody('my-profile');
         ShowIncompleteProfileWarning();
@@ -662,12 +666,14 @@ async function SubmitApplication() {
     const applicationFormData = JSON.parse(localStorage.getItem('applicationFormData'));
 
     if (!applicationFormData || !applicationFormData.order_id) {
+        HideOverlay();
         ShowErrorMessage('애플리케이션 데이터가 존재하지 않습니다.');
         await FillTheBody('home');
         return;
     }
 
     if (!ValidateAvailability()) {
+        HideOverlay();
         ShowErrorMessage('최소 하나의 작업 가능 일정을 추가해주세요.');
         return;
     }
@@ -705,8 +711,10 @@ async function SubmitApplication() {
                 console.error('Error sending notification to order owner:', error);
             }
 
+            HideOverlay();
             await FillTheBody('home');
         } else if (response.status === 400 && result.message === 'You have already applied to this order.') {
+            HideOverlay();
             ShowErrorMessage('이미 이 오더에 지원하셨습니다.', 3000);
             await FillTheBody('home');
         } else {
@@ -714,6 +722,7 @@ async function SubmitApplication() {
         }
     } catch (error) {
         console.error('Error submitting application:', error);
+        HideOverlay();
         ShowErrorMessage('지원 제출 중 오류가 발생했습니다. 다시 시도해 주세요.');
     }
 }

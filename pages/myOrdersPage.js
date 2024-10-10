@@ -2,6 +2,7 @@ import { FillTheBody } from '../main.js';
 import { MakeAuthenticatedRequest } from '../api/api.js';
 import { ShowErrorMessage, ShowSuccessMessage, GetTimeAgo } from '../utils/helpers.js';
 import { postsPerPage, UpdatePagination, PopulateRegionFilter, PopulateCityFilter } from './homePage.js';
+import { ShowOverlay, HideOverlay } from '../utils/loadingSpinner.js';
 
 let myOrdersCurrentFilters = {
     region: '',
@@ -272,6 +273,8 @@ async function DeleteOrder(orderId) {
         return;
     }
 
+    ShowOverlay();
+
     try {
         const response = await MakeAuthenticatedRequest('https://vu7bkzs3p7.execute-api.ap-northeast-2.amazonaws.com/DeleteOrder', {
             method: 'POST',
@@ -296,6 +299,8 @@ async function DeleteOrder(orderId) {
     } catch (error) {
         console.error('Error deleting order:', error);
         ShowErrorMessage(error.message || '오더 삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+        HideOverlay();
     }
 }
 

@@ -5,6 +5,7 @@ import { ShowErrorMessage, ShowSuccessMessage, PopulateRegions, PopulateCities }
 import { ShowIncompleteProfileWarning } from './myProfilePage.js';
 import { CheckProfileCompleteness } from './editProfilePage.js';
 import { regions } from '../utils/constants.js';
+import { ShowOverlay, HideOverlay } from '../utils/loadingSpinner.js';
 
 let isSubmitting = false;
 
@@ -142,10 +143,14 @@ async function SubmitOrder(event) {
         return;
     }
 
+    // Show overlay to make screen unclickable
+    ShowOverlay();
+
     if (!await CheckProfileCompleteness()) {
         ShowErrorMessage('오더를 등록하려면 프로필을 완성해야 합니다.');
         await FillTheBody('my-profile');
         ShowIncompleteProfileWarning();
+        HideOverlay();
         return;
     }
 
@@ -211,7 +216,10 @@ async function SubmitOrder(event) {
 
         ShowSuccessMessage('오더가 성공적으로 제출되었습니다!');
         // 일정 시간 후 홈으로 이동
-        setTimeout(() => FillTheBody('home'), 2000);
+        setTimeout(() => {
+            HideOverlay();
+            FillTheBody('home')
+        }, 2000);
     } catch (error) {
         console.error('Error submitting order:', error);
         let errorMessage = '예상치 못한 오류가 발생했습니다. 다시 시도해주세요.';
@@ -221,6 +229,7 @@ async function SubmitOrder(event) {
             errorMessage = '오더를 제출하는 중 오류가 발생했습니다. 모든 필드를 채워주세요.';
         }
         ShowErrorMessage(errorMessage);
+        HideOverlay();
     } finally {
         submitButton.disabled = false;
         isSubmitting = false;
