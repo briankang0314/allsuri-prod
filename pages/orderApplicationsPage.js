@@ -50,6 +50,15 @@ function SetupEventListeners() {
         postOrderBtn.addEventListener('click', async () => await FillTheBody('post-order'));
     }
 
+    // Back button
+    const backBtn = document.getElementById('back-btn');
+    if (backBtn) {
+        backBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await FillTheBody('my-orders');
+        });
+    }
+
     // Menu button
     const menuBtn = document.getElementById('menu-btn');
     if (menuBtn) {
